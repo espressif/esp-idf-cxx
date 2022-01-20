@@ -1,0 +1,9 @@
+idf_component_get_property(cpp_component esp-idf-cxx COMPONENT_DIR)
+
+idf_component_register(SRCS "spi_cxx_test.cpp"
+                    INCLUDE_DIRS
+                    "."
+                    "${cpp_component}/host_test/fixtures"
+                    "${cpp_component}/private_include"
+                    $ENV{IDF_PATH}/tools/catch
+                    REQUIRES cmock driver esp-idf-cxx)
