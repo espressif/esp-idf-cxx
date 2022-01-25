@@ -13,7 +13,6 @@
 */
 #define CATCH_CONFIG_MAIN
 #include <stdio.h>
-#include "unity.h"
 #include "freertos/portmacro.h"
 #include "driver/i2c.h"
 #include "i2c_cxx.hpp"
