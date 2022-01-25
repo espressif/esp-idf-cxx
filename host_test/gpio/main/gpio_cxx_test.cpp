@@ -10,7 +10,6 @@
 
 #include <stdio.h>
 #include "esp_err.h"
-#include "unity.h"
 #include "freertos/portmacro.h"
 #include "gpio_cxx.hpp"
 #include "test_fixtures.hpp"

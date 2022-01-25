@@ -1,0 +1,68 @@
+name: Target test
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Build Test App
+    strategy:
+      fail-fast: false
+      matrix:
+        idf_ver: ["latest"]
+        idf_target: ["esp32", "esp32c3"]
+        test_app_name: ["esp_event", "esp_timer"]
+    runs-on: ubuntu-20.04
+    container: espressif/idf:${{ matrix.idf_ver }}
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          submodules: 'true'
+      - name: Build for ${{ matrix.idf_target }}
+        env:
+          IDF_TARGET: ${{ matrix.idf_target }}
+        shell: bash
+        working-directory: test_apps/${{ matrix.test_app_name }}
+        run: |
+          . ${IDF_PATH}/export.sh
+          idf.py build
+      - uses: actions/upload-artifact@v2
+        with:
+          name: test_app_bin_${{ matrix.test_app_name }}_${{ matrix.idf_target }}_${{ matrix.idf_ver }}
+          path: |
+            test_apps/${{ matrix.test_app_name }}/build/bootloader/bootloader.bin
+            test_apps/${{ matrix.test_app_name }}/build/partition_table/partition-table.bin
+            test_apps/${{ matrix.test_app_name }}/build/test_${{ matrix.test_app_name }}.bin
+            test_apps/${{ matrix.test_app_name }}/build/test_${{ matrix.test_app_name }}.elf
+            test_apps/${{ matrix.test_app_name }}/build/flasher_args.json
+
+  run-target:
+    name: Run Test App on target
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        idf_ver: ["latest"]
+        idf_target: ["esp32", "esp32c3"]
+        test_app_name: ["esp_event", "esp_timer"]
+    runs-on: [self-hosted, linux, docker, "${{ matrix.idf_target }}"]
+    container:
+      image: python:3.7-buster
+      options: --privileged # Privileged mode has access to serial ports
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v2
+        with:
+          name: test_app_bin_${{ matrix.test_app_name }}_${{ matrix.idf_target }}_${{ matrix.idf_ver }}
+          path: test_apps/${{ matrix.test_app_name }}/build
+      - name: Install Python packages
+        env:
+          PIP_EXTRA_INDEX_URL: "https://www.piwheels.org/simple"
+        run: pip install pytest-embedded pytest-embedded-serial-esp pytest-embedded-idf
+      - name: Run Test App on ${{ matrix.idf_target }}
+        working-directory: test_apps/${{ matrix.test_app_name }}
+        run: pytest -s --junit-xml=./test_app_results_${{ matrix.test_app_name }}_${{ matrix.idf_target }}_${{ matrix.idf_ver }}.xml --embedded-services esp,idf --target=${{ matrix.idf_target }}
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: test_app_results_${{ matrix.test_app_name }}_${{ matrix.idf_target }}_${{ matrix.idf_ver }}
+          path: test_apps/${{ matrix.test_app_name }}/*.xml

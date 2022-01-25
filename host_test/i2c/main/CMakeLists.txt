@@ -6,6 +6,6 @@ idf_component_register(SRCS "i2c_cxx_test.cpp"
                     "${cpp_component}/host_test/fixtures"
                     "${cpp_component}/private_include"
                     $ENV{IDF_PATH}/tools/catch
-                    REQUIRES cmock driver esp-idf-cxx)
+                    PRIV_REQUIRES driver cmock)
 
 target_link_libraries(${COMPONENT_LIB} -lpthread)

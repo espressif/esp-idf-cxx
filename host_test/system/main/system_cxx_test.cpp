@@ -93,3 +93,24 @@ TEST_CASE("Frequency op <=")
     CHECK(!(f1 <= f0));
     CHECK  (f0 <= f2);
 }
+
+TEST_CASE("CHECK_THROW continues on ESP_OK")
+{
+    esp_err_t error = ESP_OK;
+    CHECK_THROW(error);
+}
+
+TEST_CASE("CHECK_THROW throws")
+{
+    esp_err_t error = ESP_FAIL;
+    CHECK_THROWS_AS(CHECK_THROW(error), ESPException&);
+}
+
+TEST_CASE("ESPException has working what() method")
+{
+    try {
+        throw ESPException(ESP_FAIL);
+    } catch (ESPException &e) {
+        CHECK(strcmp(esp_err_to_name(ESP_FAIL), e.what()) == 0);
+    }
+}

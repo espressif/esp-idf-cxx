@@ -1,0 +1,1 @@
+<testsuites><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="2" time="7.804" timestamp="2022-06-23T20:18:57.397588" hostname="jakob-T14"><testcase file="../main/esp_timer_test.cpp" line="60" name="ESPTimer produces correct delay" /><testcase file="../main/esp_timer_test.cpp" line="90" name="ESPtimer produces correct periodic delays" /></testsuite></testsuites>

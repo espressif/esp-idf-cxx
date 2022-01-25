@@ -12,7 +12,6 @@
 
 #define CATCH_CONFIG_MAIN
 #include <stdio.h>
-#include "unity.h"
 #include "freertos/portmacro.h"
 #include "spi_host_cxx.hpp"
 #include "spi_host_private_cxx.hpp"
