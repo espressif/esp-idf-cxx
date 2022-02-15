@@ -225,7 +225,7 @@ bool SPITransactionDescriptor::wait_for(const chrono::milliseconds &timeout_dura
 
     spi_transaction_t *acquired_trans_desc;
     esp_err_t err = device_handle->get_trans_result(&acquired_trans_desc,
-            (TickType_t) timeout_duration.count() / portTICK_RATE_MS);
+            (TickType_t) timeout_duration.count() / portTICK_PERIOD_MS);
 
     if (err == ESP_ERR_TIMEOUT) {
         return false;
