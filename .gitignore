@@ -26,6 +26,10 @@ host_test/**/build
 host_test/**/sdkconfig
 host_test/**/sdkconfig.old
 
+test_apps/**/build
+test_apps/**/sdkconfig
+test_apps/**/sdkconfig.old
+
 # Unit Test CMake compile log folder
 log_ut_cmake
 
