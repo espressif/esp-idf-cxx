@@ -21,11 +21,17 @@ GPATH
 # MacOS directory files
 .DS_Store
 
+# Example Apps files
+examples/**/build
+examples/**/sdkconfig
+examples/**/sdkconfig.old
+
 # Host Unit Test Apps files
 host_test/**/build
 host_test/**/sdkconfig
 host_test/**/sdkconfig.old
 
+# Unit test app build files
 test_apps/**/build
 test_apps/**/sdkconfig
 test_apps/**/sdkconfig.old
