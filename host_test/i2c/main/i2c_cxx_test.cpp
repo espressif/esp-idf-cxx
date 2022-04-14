@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2021 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2021-2022 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Unlicense OR CC0-1.0
  *
@@ -13,6 +13,7 @@
 */
 #define CATCH_CONFIG_MAIN
 #include <stdio.h>
+#include "unity.h"
 #include "freertos/portmacro.h"
 #include "driver/i2c.h"
 #include "i2c_cxx.hpp"
@@ -375,6 +376,7 @@ TEST_CASE("I2CMaster syncronous transfer (read and write)")
     }
 }
 
+#if SOC_I2C_SUPPORT_SLAVE
 TEST_CASE("I2CSlave parameter configuration fails")
 {
     CMockFixture fix;
@@ -457,3 +459,4 @@ TEST_CASE("I2CSlave read calls driver functions correctly")
         CHECK(read_buffer[i] == WRITE_BUFFER[i]);
     }
 }
+#endif // SOC_I2C_SUPPORT_SLAVE

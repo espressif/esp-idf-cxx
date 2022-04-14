@@ -6,4 +6,4 @@ idf_component_register(SRCS "spi_cxx_test.cpp"
                     "../../fixtures"
                     "${cpp_component}/private_include"
                     $ENV{IDF_PATH}/tools/catch
-                    REQUIRES cmock driver esp-idf-cxx)
+                    PRIV_REQUIRES driver cmock)

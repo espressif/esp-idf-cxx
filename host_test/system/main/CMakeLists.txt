@@ -6,7 +6,7 @@ idf_component_register(SRCS "system_cxx_test.cpp"
                     "."
                     "${cpp_component}/include"
                     $ENV{IDF_PATH}/tools/catch
-                    REQUIRES driver esp-idf-cxx)
+                    PRIV_REQUIRES driver)
 
 target_compile_options(${COMPONENT_LIB} PUBLIC --coverage)
 target_link_libraries(${COMPONENT_LIB} --coverage)
