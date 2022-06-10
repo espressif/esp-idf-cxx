@@ -1,0 +1,22 @@
+name: Host test
+
+on: push
+
+jobs:
+  host_test:
+    name: Build and test
+    runs-on: ubuntu-20.04
+    container: espressif/idf:latest
+    steps:
+      - name: Checkout esp-idf-cxx
+        uses: actions/checkout@master
+
+      - name: Build and Test
+        shell: bash
+        run: |
+          apt-get update && apt-get install -y gcc-8 g++-8 ruby
+          update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+          . ${IDF_PATH}/export.sh
+          cd $GITHUB_WORKSPACE/host_test/gpio
+          idf.py build
+          ./build/test_gpio_cxx_host.elf
