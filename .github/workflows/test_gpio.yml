@@ -9,7 +9,7 @@ jobs:
         app_name: [esp_timer, gpio, i2c, spi, system]
     name: Build and test
     runs-on: ubuntu-20.04
-    container: espressif/idf:latest
+    container: espressif/idf:release-v5.0
     steps:
       - name: Checkout esp-idf-cxx
         uses: actions/checkout@master
