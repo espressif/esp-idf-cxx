@@ -1,11 +1,7 @@
 # This is the project CMakeLists.txt file for the test subproject
 cmake_minimum_required(VERSION 3.5)
 
-#set(EXTRA_COMPONENT_DIRS "$ENV{IDF_PATH}/tools/unit-test-app/components")
 set(COMPONENTS main)
 
-# Registration of cxx component
-list(APPEND EXTRA_COMPONENT_DIRS "../../")
-
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
-project(newlib_test)
+project(test_esp_event_test)
