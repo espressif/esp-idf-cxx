@@ -586,52 +586,6 @@ TEST(esp_event, ESPEventLoop_custom_loop_register_receive_unregister_ESPEvent)
     TEST_ASSERT(event == ESPEvent());
 }
 
-TEST(esp_event, ESPEventHandlerSync_simple_construction_and_destruction)
-{
-    EventFixture f;
-    ESPEventHandlerSync handler(make_shared<ESPEventLoop>());
-    handler.listen_to(TEMPLATE_EVENT_0);
-}
-
-TEST(esp_event, ESPEventHandlerSync_simple_event_wait)
-{
-    EventFixture f;
-    ESPEventHandlerSync handler(make_shared<ESPEventLoop>());
-    handler.listen_to(TEMPLATE_EVENT_0);
-
-    send_default_event();
-
-    ESPEventHandlerSync::EventResult result = handler.wait_event();
-
-    TEST_ASSERT_EQUAL(TEMPLATE_EVENT_0.base, result.event.base);
-    TEST_ASSERT_EQUAL(TEMPLATE_EVENT_0.id.get_id(), result.event.id.get_id());
-}
-
-TEST(esp_event, ESPEventHandlerSync_wait_for_0_succeed)
-{
-    EventFixture f;
-    ESPEventHandlerSync handler(make_shared<ESPEventLoop>());
-    handler.listen_to(TEMPLATE_EVENT_0);
-
-    send_default_event();
-
-    ESPEventHandlerSync::EventResult result = handler.wait_event_for(chrono::milliseconds(0));
-    TEST_ASSERT(TEMPLATE_EVENT_0 == result.event);
-}
-
-TEST(esp_event, ESPEventHandlerSync_start_waiting_after_events_arrived)
-{
-    EventFixture f;
-    ESPEventHandlerSync handler(make_shared<ESPEventLoop>());
-    handler.listen_to(TEMPLATE_EVENT_0);
-
-    send_default_event();
-    send_default_event();
-
-    TEST_ASSERT(handler.wait_event().event == TEMPLATE_EVENT_0);
-    TEST_ASSERT(handler.wait_event().event == TEMPLATE_EVENT_0);
-}
-
 // helper function to post events, simulating an event source
 void post_events(int event_num) {
     for (int i = 0; i < event_num; i++) {
@@ -642,88 +596,6 @@ void post_events(int event_num) {
                 portMAX_DELAY));
         vTaskDelay(10 / portTICK_PERIOD_MS);
     }
-}
-
-TEST(esp_event, ESPEventHandlerSync_simultaneous_event_handling)
-{
-    EventFixture f;
-    // Create handler with queue size 1
-    ESPEventHandlerSync handler(make_shared<ESPEventLoop>());
-    handler.listen_to(TEMPLATE_EVENT_0);
-    thread th(post_events, 3);
-
-    // no for-loop for better feedback (line numbers)
-    TEST_ASSERT(handler.wait_event().event == TEMPLATE_EVENT_0);
-    TEST_ASSERT(handler.wait_event().event == TEMPLATE_EVENT_0);
-    TEST_ASSERT(handler.wait_event().event == TEMPLATE_EVENT_0);
-
-    TEST_ASSERT_EQUAL(0, handler.get_send_queue_errors());
-    th.join();
-}
-
-TEST(esp_event, ESPEventHandlerSync_wait_for_0_timeout)
-{
-    EventFixture f;
-    ESPEventHandlerSync handler(make_shared<ESPEventLoop>());
-
-    ESPEventHandlerSync::EventResultTimed result = handler.wait_event_for(chrono::milliseconds(0));
-    TEST_ASSERT_EQUAL(true, result.timeout);
-}
-
-TEST(esp_event, ESPEventHandlerSync_register_default_event_fails)
-{
-    EventFixture f;
-    ESPEventHandlerSync handler(make_shared<ESPEventLoop>());
-    TEST_THROW(handler.listen_to(ESPEvent()), EventException);
-}
-
-TEST(esp_event, ESPEventHandlerSync_null_pointer)
-{
-    EventFixture f;
-    TEST_THROW(ESPEventHandlerSync handler(nullptr), EventException);
-}
-
-TEST(esp_event, ESPEventHandlerSync_empty_shared_ptr)
-{
-    EventFixture f;
-    shared_ptr<ESPEventLoop> event_loop;
-    TEST_THROW(ESPEventHandlerSync handler(event_loop), EventException);
-}
-
-TEST(esp_event, ESPEventHandlerSync_queue_size_0)
-{
-    EventFixture f;
-
-    TEST_THROW(ESPEventHandlerSync handler(make_shared<ESPEventLoop>(), 0), EventException);
-}
-
-TEST(esp_event, ESPEventHandlerSync_receive_after_timeout)
-{
-    EventFixture f;
-    ESPEventHandlerSync handler(make_shared<ESPEventLoop>());
-    handler.listen_to(TEMPLATE_EVENT_0);
-
-    TEST_ASSERT_EQUAL(true, handler.wait_event_for(chrono::milliseconds(0)).timeout);
-
-    send_default_event();
-
-    ESPEvent event = handler.wait_event().event;
-    TEST_ASSERT(TEMPLATE_EVENT_0 == event);
-}
-
-TEST(esp_event, ESPEventHandlerSync_send_too_many_events)
-{
-    EventFixture f;
-    // Create handler with queue size 1
-    ESPEventHandlerSync handler(make_shared<ESPEventLoop>(), 1);
-    handler.listen_to(TEMPLATE_EVENT_0);
-    TEST_ASSERT_EQUAL(0, handler.get_send_queue_errors());
-
-    send_default_event();
-    send_default_event();
-    TEST_ASSERT(handler.wait_event().event == TEMPLATE_EVENT_0);
-    TEST_ASSERT_EQUAL(true, handler.wait_event_for(chrono::milliseconds(10)).timeout);
-    TEST_ASSERT_EQUAL(1, handler.get_send_queue_errors());
 }
 
 TEST(esp_event, ESPEventAPIDefault_initialization_failure)
@@ -784,18 +656,6 @@ TEST_GROUP_RUNNER(esp_event)
     RUN_TEST_CASE(esp_event, ESPEventLoop_direct_register_timeout_and_event_no_timeout)
     RUN_TEST_CASE(esp_event, ESPEventLoop_register_timeout_and_event_timeout)
     RUN_TEST_CASE(esp_event, ESPEventLoop_custom_loop_register_receive_unregister_ESPEvent)
-    RUN_TEST_CASE(esp_event, ESPEventHandlerSync_simple_construction_and_destruction)
-    RUN_TEST_CASE(esp_event, ESPEventHandlerSync_simple_event_wait)
-    RUN_TEST_CASE(esp_event, ESPEventHandlerSync_wait_for_0_succeed)
-    RUN_TEST_CASE(esp_event, ESPEventHandlerSync_start_waiting_after_events_arrived)
-    RUN_TEST_CASE(esp_event, ESPEventHandlerSync_simultaneous_event_handling)
-    RUN_TEST_CASE(esp_event, ESPEventHandlerSync_wait_for_0_timeout)
-    RUN_TEST_CASE(esp_event, ESPEventHandlerSync_register_default_event_fails)
-    RUN_TEST_CASE(esp_event, ESPEventHandlerSync_null_pointer)
-    RUN_TEST_CASE(esp_event, ESPEventHandlerSync_empty_shared_ptr)
-    RUN_TEST_CASE(esp_event, ESPEventHandlerSync_queue_size_0)
-    RUN_TEST_CASE(esp_event, ESPEventHandlerSync_receive_after_timeout)
-    RUN_TEST_CASE(esp_event, ESPEventHandlerSync_send_too_many_events)
     RUN_TEST_CASE(esp_event, ESPEventAPIDefault_initialization_failure)
     RUN_TEST_CASE(esp_event, ESPEventAPICustom_no_mem)
 }
