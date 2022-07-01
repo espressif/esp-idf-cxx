@@ -1,16 +1,8 @@
-// Copyright 2019 Espressif Systems (Shanghai) PTE LTD
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//         http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * SPDX-FileCopyrightText: 2019-2022 Espressif Systems (Shanghai) CO LTD
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #ifndef ESP_EVENT_CXX_H_
 #define ESP_EVENT_CXX_H_
@@ -69,6 +61,7 @@ class ESPEventID {
 public:
     ESPEventID() : id(0) { }
     explicit ESPEventID(int32_t event_id) : id(event_id) { }
+    ESPEventID(const ESPEventID &rhs) : id(rhs.id) { }
 
     inline bool operator==(const ESPEventID &rhs) const {
         return id == rhs.get_id();
@@ -330,119 +323,6 @@ private:
      * custom event loop API.
      */
     std::shared_ptr<ESPEventAPI> api;
-};
-
-/**
- * ESPEventHandlerSync builds upon ESPEventLoop to create a class which allows synchronous event handling.
- *
- * It is built around a queue which buffers received events. This queue is also used to wait synchronously (blocking)
- * for an event. The consequence is that once an event is registered with this class, it is guaranteed to be received
- * as long as the queue can handle all incoming events (see \c get_send_queue_errors()).
- */
-class ESPEventHandlerSync {
-public:
-    /**
-     * Result type for synchronous waiting.
-     */
-    struct EventResult {
-        EventResult() : event(), ev_data(nullptr) { }
-        EventResult(ESPEvent ev, void *ev_data) : event(ev), ev_data(ev_data) { }
-        ESPEvent event;
-        void *ev_data;
-    };
-
-    /**
-     * Result type for synchronous waiting with timeout.
-     */
-    struct EventResultTimed : public EventResult {
-        EventResultTimed(EventResult event_result, bool timeout_arg)
-            : EventResult(event_result), timeout(timeout_arg) { }
-        bool timeout;
-    };
-
-    /**
-     * Sets up synchronous event handling and registers event with it.
-     *
-     * @param event_loop ESPEventLoop implementation to manage esp events.
-     * @param queue_max_size The queue size of the underlying FreeRTOS queue.
-     *        The memory to store queue_max_size number of events is allocated during construction
-     *        and held until destruction!
-     * @param queue_send_timeout The timeout for posting events to the internal queue
-     */
-    ESPEventHandlerSync(std::shared_ptr<ESPEventLoop> event_loop,
-                        size_t queue_max_size = 10,
-                        TickType_t queue_send_timeout = 0);
-
-    /**
-     * Unregister all formerly registered events via automatic destruction in registry.
-     */
-    virtual ~ESPEventHandlerSync();
-
-    /**
-     * Waits for any of the events registered before with listen_to().
-     */
-    EventResult wait_event();
-
-    /**
-     * Waits for an event either PLATFORM_MAX_DELAY_MS ms or timeout ms.
-     *
-     * @param timeout the maximum waiting time for new events if no event is pending
-     *       The timeout is restricted by the TickType_t and configTICK_RATE_HZ.
-     *       TickType_t's width determines the maximum wait time. configTICK_RATE_HZ
-     *       determines the minimum wait time.
-     *
-     * Throws EventTimeout in case of a timeout.
-     */
-    EventResultTimed wait_event_for(const std::chrono::milliseconds &timeout);
-
-    /**
-     * Register additional event to listen for.
-     *
-     * @note this will unregister all earlier registered events of the same event type from the event loop.
-     */
-    void listen_to(const ESPEvent &event);
-
-    /**
-     * Indicates whether there were errors inserting an event into the queue.
-     * This is the case e.g. if the queue with waiting events is full already.
-     * Use this function to adjust the queue size (\c queue_send_timeout in constructor) in your application.
-     */
-    size_t get_send_queue_errors() const;
-
-protected:
-    /**
-     * Posts an event to the internal queue.
-     */
-    void post_event(const EventResult &result);
-
-private:
-    /**
-     * Keeps track if there are any errors inserting an event into this class's event queue.
-     */
-    std::atomic<size_t> send_queue_errors;
-
-    /**
-     * The queue which saves events if they were received already or waits if no event was
-     * received.
-     */
-    QueueHandle_t event_queue;
-
-    /**
-     * Timeout used to posting to the queue when using \c post_event(). Can be adjusted in constructor.
-     */
-    TickType_t queue_send_timeout;
-
-    /**
-     * The event loop used for this synchronous event handling class.
-     */
-    std::shared_ptr<ESPEventLoop> event_loop;
-
-    /**
-     * Keeps track of all events which are registered already for synchronous handling.
-     *
-     * This is necessary to keep the registration.
-     */
-    std::vector<std::shared_ptr<ESPEventReg> > registry;
 };
 
 template<typename T>

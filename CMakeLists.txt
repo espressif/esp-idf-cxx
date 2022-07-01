@@ -1,7 +1,7 @@
 idf_build_get_property(target IDF_TARGET)
 
 set(srcs "esp_timer_cxx.cpp" "esp_exception.cpp" "gpio_cxx.cpp" "i2c_cxx.cpp" "spi_cxx.cpp" "spi_host_cxx.cpp")
-set(requires "esp_timer" "driver")
+set(requires "esp_timer")
 
 if(NOT ${target} STREQUAL "linux")
     list(APPEND srcs
@@ -13,5 +13,5 @@ endif()
 idf_component_register(SRCS ${srcs}
                     INCLUDE_DIRS "include"
                     PRIV_INCLUDE_DIRS "private_include"
-                    PRIV_REQUIRES freertos
+                    PRIV_REQUIRES freertos driver
                     REQUIRES ${requires})

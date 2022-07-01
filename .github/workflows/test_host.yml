@@ -1,0 +1,25 @@
+name: Host test
+
+on: [push, pull_request]
+
+jobs:
+  host_test:
+    strategy:
+      matrix:
+        app_name: [esp_timer, gpio, i2c, spi, system]
+    name: Build and test
+    runs-on: ubuntu-20.04
+    container: espressif/idf:release-v5.0
+    steps:
+      - name: Checkout esp-idf-cxx
+        uses: actions/checkout@master
+
+      - name: Build and Test
+        shell: bash
+        run: |
+          apt-get update && apt-get install -y gcc-8 g++-8 ruby
+          update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+          . ${IDF_PATH}/export.sh
+          cd $GITHUB_WORKSPACE/host_test/${{ matrix.app_name }}
+          idf.py build
+          ./build/test_${{ matrix.app_name }}_cxx_host.elf
