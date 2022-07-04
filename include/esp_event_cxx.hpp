@@ -4,8 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef ESP_EVENT_CXX_H_
-#define ESP_EVENT_CXX_H_
+#pragma once
 
 #ifdef __cpp_exceptions
 
@@ -346,5 +345,3 @@ void ESPEventLoop::post_event_data(const ESPEvent &event,
 } // namespace idf
 
 #endif // __cpp_exceptions
-
-#endif // ESP_EVENT_CXX_H_

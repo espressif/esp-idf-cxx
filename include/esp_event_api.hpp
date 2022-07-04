@@ -1,5 +1,10 @@
-#ifndef ESP_EVENT_API_HPP_
-#define ESP_EVENT_API_HPP_
+/*
+ * SPDX-FileCopyrightText: 2019-2022 Espressif Systems (Shanghai) CO LTD
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#pragma once
 
 #include "esp_event.h"
 
@@ -118,5 +123,3 @@ private:
 } // event
 
 } // idf
-
-#endif // ESP_EVENT_API_HPP_

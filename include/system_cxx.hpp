@@ -4,12 +4,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#pragma once
+
 /**
  * This file contains helper classes for commonly used IDF types. The classes make the use of these types easier and
  * safer.
  * In particular, their usage provides greater type-safety of function arguments and "correctness by construction".
  */
-#pragma once
 
 #ifndef __cpp_exceptions
 #error system C++ classes only usable when C++ exceptions enabled. Enable CONFIG_COMPILER_CXX_EXCEPTIONS in Kconfig
