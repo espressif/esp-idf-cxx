@@ -1,9 +1,9 @@
 /*
+ * I2C C++ unit tests
+ *
  * SPDX-FileCopyrightText: 2021-2022 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Unlicense OR CC0-1.0
- *
- * I2C C++ unit tests
  *
  * This example code is in the Public Domain (or CC0 licensed, at your option.)
  *

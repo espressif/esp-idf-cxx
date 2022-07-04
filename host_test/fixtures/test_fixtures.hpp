@@ -10,6 +10,8 @@
  * CONDITIONS OF ANY KIND, either express or implied.
 */
 
+#pragma once
+
 #include "catch.hpp"
 #include "gpio_cxx.hpp"
 #include "driver/spi_master.h"

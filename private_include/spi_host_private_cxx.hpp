@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#pragma once
+
 /**
  * The code in this file includes driver headers directly, hence it's a private include.
  * It should only be used in C++ source files, while header files use forward declarations of the types.
