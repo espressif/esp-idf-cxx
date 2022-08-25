@@ -13,11 +13,10 @@
  */
 
 #include <limits>
-#include <stdio.h>
-#include <iostream>
 
 #include "unity.h"
 #include "unity_cxx.hpp"
+#include "utils_cxx.hpp"
 #include "test_utils.h" // ref clock
 
 #include "freertos/FreeRTOS.h"
@@ -81,7 +80,7 @@ TEST_CASE("ESPTimer produces correct delay", "[ESPTimer]")
         vTaskDelay(delays_ms[i] * 2 / portTICK_PERIOD_MS);
         TEST_ASSERT(t_end != 0);
         int32_t ms_diff = (t_end - t_start) / 1000;
-        printf("%d %d\n", delays_ms[i], ms_diff);
+        TEST_APPS_LOG("%d %ld", delays_ms[i], ms_diff);
 
         TEST_ASSERT_INT32_WITHIN(portTICK_PERIOD_MS, delays_ms[i], ms_diff);
     }
@@ -100,7 +99,7 @@ TEST_CASE("ESPtimer produces correct periodic delays", "[ESPTimer]")
     function<void()> timer_cb = [&]() {
         int64_t t_end = ref_clock_get();
         int32_t ms_diff = (t_end - t_start) / 1000;
-        printf("timer #%d %dms\n", cur_interval, ms_diff);
+        TEST_APPS_LOG("timer #%d %ldms", cur_interval, ms_diff);
         if (cur_interval < NUM_INTERVALS) {
            intervals[cur_interval++] = ms_diff;
         }
@@ -108,7 +107,7 @@ TEST_CASE("ESPtimer produces correct periodic delays", "[ESPTimer]")
         // We check that this doesn't affect the result.
         esp_rom_delay_us(10*1000);
         if (cur_interval == NUM_INTERVALS) {
-            printf("done\n");
+            TEST_APPS_LOG("done");
             xSemaphoreGive(done);
         }
     };
@@ -133,6 +132,6 @@ TEST_CASE("ESPtimer produces correct periodic delays", "[ESPTimer]")
 
 extern "C" void app_main(void)
 {
-    printf("CXX ESP TIMER TEST\n");
+    TEST_APPS_LOG("CXX ESP TIMER TEST");
     unity_run_menu();
 }
