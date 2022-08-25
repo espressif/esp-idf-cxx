@@ -81,7 +81,7 @@ TEST_CASE("ESPTimer produces correct delay", "[ESPTimer]")
         vTaskDelay(delays_ms[i] * 2 / portTICK_PERIOD_MS);
         TEST_ASSERT(t_end != 0);
         int32_t ms_diff = (t_end - t_start) / 1000;
-        printf("%d %d\n", delays_ms[i], ms_diff);
+        printf("%d %ld\n", delays_ms[i], ms_diff);
 
         TEST_ASSERT_INT32_WITHIN(portTICK_PERIOD_MS, delays_ms[i], ms_diff);
     }
@@ -100,7 +100,7 @@ TEST_CASE("ESPtimer produces correct periodic delays", "[ESPTimer]")
     function<void()> timer_cb = [&]() {
         int64_t t_end = ref_clock_get();
         int32_t ms_diff = (t_end - t_start) / 1000;
-        printf("timer #%d %dms\n", cur_interval, ms_diff);
+        printf("timer #%d %ldms\n", cur_interval, ms_diff);
         if (cur_interval < NUM_INTERVALS) {
            intervals[cur_interval++] = ms_diff;
         }
