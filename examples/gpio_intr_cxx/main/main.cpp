@@ -22,19 +22,25 @@ using namespace std::placeholders;
 
 class TriggerCounter {
 public:
-    TriggerCounter(uint32_t _gpio_num) : trigger_counter(0), gpio_num(_gpio_num) {}
+    TriggerCounter(GPIONum _gpio_num) : trigger_counter(0), gpio_num(_gpio_num) {}
 
     inline uint16_t get_interrupt_counter() { return trigger_counter; }
 
-    inline void callback(uint32_t gpio_num) { trigger_counter++; }
+    inline void callback(GPIONum gpio_num) { trigger_counter++; }
 
-    inline bool init() {
-        cout << "initializing interrupt on GPIO " << gpio_num << endl;
-        return GPIOIntr.gpio_intr_set(gpio_num, 0, 0, std::bind(&TriggerCounter::callback, this, _1));
+    inline void init() {
+        cout << "initializing interrupt on GPIO " << gpio_num.get_num() << endl;
+        try {
+            GPIOIntr.gpio_set_intr(GPIONum(GPIO_NUM), GPIOIntrType::POSEDGE(), 0, std::bind(&TriggerCounter::callback, this, _1));
+        }
+        catch (const GPIOException& e)
+        {
+            printf("Error %d occured\n", e.error);
+        }
     }
 private:
     uint16_t trigger_counter;
-    uint32_t gpio_num;
+    GPIONum gpio_num;
 };
 
 extern "C" void app_main(void)
@@ -44,7 +50,7 @@ extern "C" void app_main(void)
     gpio_i.set_pull_mode(GPIOPullMode::PULLDOWN());
 
     // create the trigger counter class
-    TriggerCounter myTrigCounter(GPIO_NUM);
+    TriggerCounter myTrigCounter(GPIONum(GPIO_NUM));
     myTrigCounter.init();
 
     uint16_t prev_counter = 0;

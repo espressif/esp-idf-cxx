@@ -12,8 +12,6 @@
 
 namespace idf {
 
-#define GPIO_CHECK_THROW(err) CHECK_THROW_SPECIFIC((err), GPIOException)
-
 namespace {
 #if CONFIG_IDF_TARGET_LINUX
 constexpr std::array<uint32_t, 1> INVALID_GPIOS = {24};

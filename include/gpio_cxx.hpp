@@ -13,6 +13,8 @@
 
 namespace idf {
 
+#define GPIO_CHECK_THROW(err) CHECK_THROW_SPECIFIC((err), GPIOException)
+
 /**
  * @brief Exception thrown for errors in the GPIO C++ API.
  */
@@ -32,6 +34,7 @@ esp_err_t check_gpio_pin_num(uint32_t pin_num) noexcept;
  * Check if the numeric value of a drive strength is valid on the current hardware.
  */
 esp_err_t check_gpio_drive_strength(uint32_t strength) noexcept;
+
 
 /**
  * This is a "Strong Value Type" class for GPIO. The GPIO pin number is checked during construction according to
@@ -56,6 +59,11 @@ public:
 
     using StrongValueComparable<uint32_t>::operator==;
     using StrongValueComparable<uint32_t>::operator!=;
+
+    /**
+     * Retrieves the valid numerical representation of the GPIO number.
+     */
+    uint32_t get_num() const { return get_value(); };
 };
 
 /**

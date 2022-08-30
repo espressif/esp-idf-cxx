@@ -6,13 +6,75 @@
 
 #pragma once
 
+#if __cpp_exceptions
+
 #include <cstdint>
 #include <functional>
 #include <iostream>
 #include <map>
 
-namespace idf
-{
+#include "gpio_cxx.hpp"
+
+using namespace std;
+
+namespace idf {
+
+/**
+ * @brief Valid representation of GPIO interrupt type.
+ */
+class GPIOIntrType : public StrongValueComparable<uint8_t> {
+    /**
+     * Construct a valid representation of the GPIO interrupt type.
+     *
+     * This constructor is private because the it can only be accessed but the static creation methods below.
+     * This guarantees that an instance of GPIOIntrType always carries a valid number.
+     */
+    constexpr explicit GPIOIntrType(uint8_t number) : StrongValueComparable<uint8_t>(number) { }
+
+public:
+    /**
+     * @brief create a GPIO interrupt type DISABLE.
+     */
+    constexpr static GPIOIntrType DISABLE() {
+        return GPIOIntrType(0);
+    }
+
+    /**
+     * @brief create a GPIO interrupt type POSEDGE.
+     */
+    constexpr static GPIOIntrType POSEDGE() {
+        return GPIOIntrType(1);
+    }
+
+    /**
+     * @brief create a GPIO interrupt type NEGEDGE.
+     */
+    constexpr static GPIOIntrType NEGEDGE() {
+        return GPIOIntrType(2);
+    }
+
+    /**
+     * @brief create a GPIO interrupt type ANYEDGE.
+     */
+    constexpr static GPIOIntrType ANYEDGE() {
+        return GPIOIntrType(3);
+    }
+
+    /**
+     * @brief create a GPIO interrupt type LOW_LEVEL.
+     */
+    constexpr static GPIOIntrType LOW_LEVEL() {
+        return GPIOIntrType(4);
+    }
+
+    /**
+     * @brief create a GPIO interrupt type HIGH_LEVEL.
+     */
+    constexpr static GPIOIntrType HIGH_LEVEL() {
+        return GPIOIntrType(5);
+    }
+};
+
 /**
  * @brief GPIO interrupt singleton. Used to register interrupt callback
  * on given GPIOs.
@@ -25,13 +87,7 @@ public:
      * @todo Define what will be useful to store in the parameter. For
      * now it is just the gpio_number but we might want to send more.
      */
-    typedef std::function<void(uint32_t)> interrupt_callback;
-
-    /**
-     * @brief CXX GPIO interrupt types
-     * @todo Link with C definitions
-     */
-    typedef uint32_t gpio_intr_type;
+    typedef function<void(GPIONum)> interrupt_callback;
 
     /**
      * @brief CXX GPIO interrupt priority
@@ -58,24 +114,22 @@ public:
      * @param type The type of interrupt that is triggered on the GPIO
      * @param priority The priority of the interrupt registered
      * @param func_cb The callback function called on interrupt
-     * @return true The registration was successful
-     * @return false Wrong GPIO, wrong interrupt type or null pointer passed as arguments.
      */
-    bool gpio_intr_set(uint32_t gpio_number, gpio_intr_type type, gpio_intr_priority priority, interrupt_callback func_cb);
+    void gpio_set_intr(GPIONum gpio_number, GPIOIntrType type, gpio_intr_priority priority, interrupt_callback func_cb);
 
     /**
      * @brief Enable the interrupts on a given GPIO
      * 
      * @param gpio_input The GPIO number
      */
-    void gpio_intr_enable(uint32_t gpio_number);
+    void gpio_enable_intr(GPIONum gpio_number) const;
 
     /**
      * @brief Disable interrupts on a given GPIO
      * 
      * @param gpio_input The GPIO number
      */
-    void gpio_intr_disable(uint32_t gpio_number);
+    void gpio_disable_intr(GPIONum gpio_number) const;
 
     /**
      * @brief Get the callback table to find what user defined callback to call
@@ -83,9 +137,9 @@ public:
      * 
      * @todo Find a way to pass the user callback directly to the gpio driver?
      * 
-     * @return std::map<uint32_t, interrupt_callback>& The callback map addressed by GPIO number
+     * @return map<uint32_t, interrupt_callback>& The callback map addressed by GPIO number
      */
-    inline std::map<uint32_t, interrupt_callback>& get_table() {return callback_table; }
+    inline map<uint32_t, interrupt_callback>& get_table() {return callback_table; }
 
 private:
 
@@ -102,7 +156,7 @@ private:
      *  
      * @todo Change to a map of list? If several callbacks are defined for one GPIO?
      */
-    std::map<uint32_t, interrupt_callback> callback_table;
+    map<uint32_t, interrupt_callback> callback_table;
 
     GPIO_Intr(): isr_service_started(false) {}
     GPIO_Intr(const GPIO_Intr&);
@@ -115,3 +169,5 @@ private:
 static GPIO_Intr &GPIOIntr = GPIO_Intr::get_instance();
 
 } // namespace idf
+
+#endif // __cpp_exceptions

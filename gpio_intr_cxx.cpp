@@ -9,6 +9,29 @@
 #include "driver/gpio.h"
 
 namespace idf {
+
+namespace {
+
+/**
+ * @brief Return the converted GPIO interrupt type usable by the C driver
+ * 
+ * @param num The CXX representation of the GPIO interrupt type
+ * @return gpio_num_t The C driver representation of the GPIO interrupt type
+ */
+gpio_int_type_t gpio_int_type_to_driver_type(GPIOIntrType type) {
+    return static_cast<gpio_int_type_t>(type.get_value());
+}
+
+/**
+ * @brief Return the converted GPIO number usable by the C driver
+ * 
+ * @param num The CXX representation of the GPIO number
+ * @return gpio_num_t The C driver representation of the GPIO number
+ */
+gpio_num_t gpio_num_to_driver_num(GPIONum num) {
+    return static_cast<gpio_num_t>(num.get_value());
+}
+
 /**
  * @brief Generic callback registered to the gpio driver
  * 
@@ -27,50 +50,43 @@ static void generic_callback(void *arg)
      * @todo remove this hack
      */
     uint32_t gpio_number = reinterpret_cast<uint64_t>(arg);
-    
     auto cb = table.find(gpio_number);
     if (cb != table.end())
     {
-        cb->second(gpio_number);
+        cb->second(GPIONum(gpio_number));
     }
 }
+}
 
-bool GPIO_Intr::gpio_intr_set(uint32_t gpio_number, gpio_intr_type type, gpio_intr_priority priority, interrupt_callback func_cb)
+void GPIO_Intr::gpio_set_intr(GPIONum gpio_number, GPIOIntrType type, gpio_intr_priority priority, interrupt_callback func_cb)
 {
-    esp_err_t ret_val = ESP_FAIL;
-
     if (isr_service_started != true)
     {
-        gpio_install_isr_service(0);
+        GPIO_CHECK_THROW(gpio_install_isr_service(0));
         isr_service_started = true;
     }
 
-    if (callback_table.find(gpio_number) == callback_table.end())
+    if (callback_table.find(gpio_number.get_num()) == callback_table.end())
     {
-        callback_table.insert({gpio_number, func_cb});
-        gpio_set_intr_type((gpio_num_t) gpio_number, GPIO_INTR_POSEDGE);
+        callback_table.insert({gpio_number.get_num(), func_cb});
 
-        ret_val = gpio_isr_handler_add(static_cast<gpio_num_t>(gpio_number),
-                                        static_cast<gpio_isr_t>(generic_callback),
-                                        reinterpret_cast<void*>(gpio_number));
-    }
-    
-    if (ret_val == ESP_OK)
-    {
-        printf("interrupt handler added successfully\n");
-    }
+        GPIO_CHECK_THROW(gpio_set_intr_type(gpio_num_to_driver_num(gpio_number),
+                                            gpio_int_type_to_driver_type(type)));
 
-    return (ret_val == ESP_OK ? true : false);
+        GPIO_CHECK_THROW(gpio_isr_handler_add(gpio_num_to_driver_num(gpio_number),
+                                              static_cast<gpio_isr_t>(generic_callback),
+                                              reinterpret_cast<void*>(gpio_number.get_num())));
+    }
 }
 
-void GPIO_Intr::gpio_intr_enable(uint32_t gpio_number)
+void GPIO_Intr::gpio_enable_intr(GPIONum gpio_number) const
 {
-    gpio_intr_enable(gpio_number);
+    GPIO_CHECK_THROW(gpio_intr_enable(gpio_num_to_driver_num(gpio_number)));
 }
 
-void GPIO_Intr::gpio_intr_disable(uint32_t gpio_number)
+void GPIO_Intr::gpio_disable_intr(GPIONum gpio_number) const
 {
-    gpio_intr_disable(gpio_number);
+    GPIO_CHECK_THROW(gpio_intr_disable(gpio_num_to_driver_num(gpio_number)));
 }
 
 }  // namespace idf
