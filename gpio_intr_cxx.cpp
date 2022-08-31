@@ -88,6 +88,18 @@ void GPIO_Intr::gpio_set_intr(GPIONum gpio_number, GPIOIntrType type, interrupt_
     }
 }
 
+void GPIO_Intr::gpio_remove_intr(GPIONum gpio_number)
+{
+    auto num = gpio_number.get_num();
+
+    // remove the callback from the callback table
+    GPIO_CHECK_THROW(callback_table.find(num) != callback_table.end() ? ESP_OK : ESP_FAIL);
+    callback_table.erase(num);
+
+    // remove the handler on the driver level
+    GPIO_CHECK_THROW(gpio_isr_handler_remove(gpio_num_to_driver_num(gpio_number)));
+}
+
 void GPIO_Intr::gpio_enable_intr(GPIONum gpio_number) const
 {
     GPIO_CHECK_THROW(gpio_intr_enable(gpio_num_to_driver_num(gpio_number)));

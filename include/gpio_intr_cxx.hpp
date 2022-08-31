@@ -286,6 +286,13 @@ public:
     void gpio_set_intr(GPIONum gpio_number, GPIOIntrType type, interrupt_callback func_cb);
 
     /**
+     * @brief Disable interrupt on the given GPIO number and remove the associated handler
+     * 
+     * @param gpio_number The GPIO number on which to remove the interrupt service
+     */
+    void gpio_remove_intr(GPIONum gpio_number);
+
+    /**
      * @brief Enable the interrupts on a given GPIO
      * 
      * @param gpio_input The GPIO number
