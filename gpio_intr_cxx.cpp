@@ -56,16 +56,25 @@ static void generic_callback(void *arg)
         cb->second(GPIONum(gpio_number));
     }
 }
+} // namespace
+
+void GPIO_Intr::gpio_start_isr_service(GPIOIsrFlag flag)
+{
+    if (isr_service_started) { return; }
+    GPIO_CHECK_THROW(gpio_install_isr_service(flag.get_value()));
+    isr_service_started = true;
 }
 
-void GPIO_Intr::gpio_set_intr(GPIONum gpio_number, GPIOIntrType type, gpio_intr_priority priority, interrupt_callback func_cb)
+void GPIO_Intr::gpio_stop_isr_service(void)
 {
-    if (isr_service_started != true)
-    {
-        GPIO_CHECK_THROW(gpio_install_isr_service(0));
-        isr_service_started = true;
-    }
+    gpio_uninstall_isr_service();
+    isr_service_started = false;
+}
 
+void GPIO_Intr::gpio_set_intr(GPIONum gpio_number, GPIOIntrType type, interrupt_callback func_cb)
+{
+    GPIO_CHECK_THROW(isr_service_started == true ? ESP_OK : ESP_FAIL);
+    
     if (callback_table.find(gpio_number.get_num()) == callback_table.end())
     {
         callback_table.insert({gpio_number.get_num(), func_cb});

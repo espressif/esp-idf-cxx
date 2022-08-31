@@ -31,11 +31,12 @@ public:
     inline void init() {
         cout << "initializing interrupt on GPIO " << gpio_num.get_num() << endl;
         try {
-            GPIOIntr.gpio_set_intr(GPIONum(GPIO_NUM), GPIOIntrType::POSEDGE(), 0, std::bind(&TriggerCounter::callback, this, _1));
+            GPIOIntr.gpio_start_isr_service(GPIOIsrFlag().LEVEL1());
+            GPIOIntr.gpio_set_intr(GPIONum(GPIO_NUM), GPIOIntrType::POSEDGE(), std::bind(&TriggerCounter::callback, this, _1));
         }
         catch (const GPIOException& e)
         {
-            printf("Error %d occured\n", e.error);
+            printf("Error 0x%x occured\n", e.error);
         }
     }
 private:

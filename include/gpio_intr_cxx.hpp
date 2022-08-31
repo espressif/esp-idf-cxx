@@ -20,6 +20,163 @@ using namespace std;
 namespace idf {
 
 /**
+ * @brief Valid representation of ISR service flags.
+ */
+class GPIOIsrFlag {
+public:
+    constexpr explicit GPIOIsrFlag() : flags(0) { }
+
+    /**
+     * @brief Add the LEVEL1 by OR operation to the
+     * member variable flags
+     * 
+     * @return GPIOIsrFlag& Return a reference to the class
+     * to allow concatenating calls to other functions.
+     */
+    constexpr GPIOIsrFlag& LEVEL1() {
+        add_flag(1<<1);
+        return *this;
+    }
+
+    /**
+     * @brief Add the LEVEL2 by OR operation to the
+     * member variable flags
+     * 
+     * @return GPIOIsrFlag& Return a reference to the class
+     * to allow concatenating calls to other functions.
+     */
+    constexpr GPIOIsrFlag& LEVEL2() {
+        add_flag(1<<2);
+        return *this;
+    }
+
+    /**
+     * @brief Add the LEVEL3 by OR operation to the
+     * member variable flags
+     * 
+     * @return GPIOIsrFlag& Return a reference to the class
+     * to allow concatenating calls to other functions.
+     */
+    constexpr GPIOIsrFlag& LEVEL3() {
+        add_flag(1<<3);
+        return *this;
+    }
+
+    /**
+     * @brief Add the LEVEL4 by OR operation to the
+     * member variable flags
+     * 
+     * @return GPIOIsrFlag& Return a reference to the class
+     * to allow concatenating calls to other functions.
+     */
+    constexpr GPIOIsrFlag& LEVEL4() {
+        add_flag(1<<4);
+        return *this;
+    }
+
+    /**
+     * @brief Add the LEVEL5 by OR operation to the
+     * member variable flags
+     * 
+     * @return GPIOIsrFlag& Return a reference to the class
+     * to allow concatenating calls to other functions.
+     */
+    constexpr GPIOIsrFlag& LEVEL5() {
+        add_flag(1<<5);
+        return *this;
+    }
+
+    /**
+     * @brief Add the LEVEL6 by OR operation to the
+     * member variable flags
+     * 
+     * @return GPIOIsrFlag& Return a reference to the class
+     * to allow concatenating calls to other functions.
+     */
+    constexpr GPIOIsrFlag& LEVEL6() {
+        add_flag(1<<6);
+        return *this;
+    }
+
+    /**
+     * @brief Add the NMI by OR operation to the
+     * member variable flags
+     * 
+     * @return GPIOIsrFlag& Return a reference to the class
+     * to allow concatenating calls to other functions.
+     */
+    constexpr GPIOIsrFlag& NMI() {
+        add_flag(1<<7);
+        return *this;
+    }
+
+    /**
+     * @brief Add the SHARED by OR operation to the
+     * member variable flags
+     * 
+     * @return GPIOIsrFlag& Return a reference to the class
+     * to allow concatenating calls to other functions.
+     */
+    constexpr GPIOIsrFlag& SHARED() {
+        add_flag(1<<8);
+        return *this;
+    }
+
+    /**
+     * @brief Add the EDGE by OR operation to the
+     * member variable flags
+     * 
+     * @return GPIOIsrFlag& Return a reference to the class
+     * to allow concatenating calls to other functions.
+     */
+    constexpr GPIOIsrFlag& EDGE() {
+        add_flag(1<<9);
+        return *this;
+    }
+
+    /**
+     * @brief Add the IRAM by OR operation to the
+     * member variable flags
+     * 
+     * @return GPIOIsrFlag& Return a reference to the class
+     * to allow concatenating calls to other functions.
+     */
+    constexpr GPIOIsrFlag& IRAM() {
+        add_flag(1<<10);
+        return *this;
+    }
+
+    /**
+     * @brief Add the INTRDISABLED by OR operation to the
+     * member variable flags
+     * 
+     * @return GPIOIsrFlag& Return a reference to the class
+     * to allow concatenating calls to other functions.
+     */
+    constexpr GPIOIsrFlag& INTRDISABLED() {
+        add_flag(1<<11);
+        return *this;
+    }
+
+    /**
+     * @brief Get the flags value
+     * 
+     * @return int The ISR service flag
+     */
+    inline int get_value() const {
+        return flags;
+    }
+
+private:
+    int flags;
+
+    inline constexpr void add_flag(int flag) {
+        flags |= flag;
+    }
+
+};
+
+/**
  * @brief Valid representation of GPIO interrupt type.
  */
 class GPIOIntrType : public StrongValueComparable<uint8_t> {
@@ -107,15 +264,26 @@ public:
     }
 
     /**
+     * @brief Start ISR service with the given set of flags
+     * 
+     * @param flag ORed flag to be set when starting the ISR service.
+     */
+    void gpio_start_isr_service(GPIOIsrFlag flag);
+
+    /**
+     * @brief Stop the ISR service
+     */
+    void gpio_stop_isr_service(void);
+
+    /**
      * @brief Set an interrupt of a given type oin a given GPIO. Register the function callback
      * linked to this interrupt.
      * 
      * @param gpio_input The GPIO number
      * @param type The type of interrupt that is triggered on the GPIO
-     * @param priority The priority of the interrupt registered
      * @param func_cb The callback function called on interrupt
      */
-    void gpio_set_intr(GPIONum gpio_number, GPIOIntrType type, gpio_intr_priority priority, interrupt_callback func_cb);
+    void gpio_set_intr(GPIONum gpio_number, GPIOIntrType type, interrupt_callback func_cb);
 
     /**
      * @brief Enable the interrupts on a given GPIO
