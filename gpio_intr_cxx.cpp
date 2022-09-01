@@ -50,62 +50,100 @@ static void generic_callback(void *arg)
      * @todo remove this hack
      */
     uint32_t gpio_number = reinterpret_cast<uint64_t>(arg);
-    auto cb = table.find(gpio_number);
-    if (cb != table.end())
+    auto cbs = table.find(gpio_number);
+    if (cbs != table.end())
     {
-        cb->second(GPIONum(gpio_number));
+        for (auto &cb: cbs->second) {
+            cb.second(GPIONum(gpio_number));
+        }
     }
 }
 } // namespace
 
-void GPIO_Intr::gpio_start_isr_service(GPIOIsrFlag flag)
+GPIO_Intr::GPIO_Intr(): isr_service_started(false), 
+                        interrupt_type_set(false)
+{
+    // nothing to do here
+}
+
+void GPIO_Intr::start_isr_service(GPIOIsrFlag flag)
 {
     if (isr_service_started) { return; }
     GPIO_CHECK_THROW(gpio_install_isr_service(flag.get_value()));
     isr_service_started = true;
 }
 
-void GPIO_Intr::gpio_stop_isr_service(void)
+void GPIO_Intr::stop_isr_service(void)
 {
     gpio_uninstall_isr_service();
     isr_service_started = false;
 }
 
-void GPIO_Intr::gpio_set_intr(GPIONum gpio_number, GPIOIntrType type, interrupt_callback func_cb)
+void GPIO_Intr::set_type(GPIONum gpio_number, GPIOIntrType type)
 {
-    GPIO_CHECK_THROW(isr_service_started == true ? ESP_OK : ESP_FAIL);
-    
-    if (callback_table.find(gpio_number.get_num()) == callback_table.end())
+    GPIO_CHECK_THROW(gpio_set_intr_type(gpio_num_to_driver_num(gpio_number),
+                                        gpio_int_type_to_driver_type(type)));
+    interrupt_type_set = true;
+}
+
+void GPIO_Intr::add_callback(GPIONum gpio_number,  std::string cb_name, interrupt_callback func_cb)
+{
+    GPIO_CHECK_THROW(isr_service_started == true && interrupt_type_set == true ? ESP_OK : ESP_FAIL);
+
+    auto cbs = cb_table.find(gpio_number.get_num());
+    if (cbs == cb_table.end())
     {
-        callback_table.insert({gpio_number.get_num(), func_cb});
+        cb_table.insert({gpio_number.get_num(), {cb_table_entry_t(cb_name, func_cb)}});
 
-        GPIO_CHECK_THROW(gpio_set_intr_type(gpio_num_to_driver_num(gpio_number),
-                                            gpio_int_type_to_driver_type(type)));
-
+        // first callback registered, add the generic callback to the gpio driver
         GPIO_CHECK_THROW(gpio_isr_handler_add(gpio_num_to_driver_num(gpio_number),
                                               static_cast<gpio_isr_t>(generic_callback),
                                               reinterpret_cast<void*>(gpio_number.get_num())));
     }
+    else if (find_if(cbs->second.begin(), cbs->second.end(), [cb_name](cb_table_entry_t e) {
+        return cb_name == e.first;
+    }) == cbs->second.end())
+    {
+        // generic callback already registered. Only add the user callback to the
+        // list of callbacks associated to the given GPIO.
+        cbs->second.push_back(cb_table_entry_t(cb_name, func_cb));
+    }
+    else
+    {
+        // nothing to do here
+    }
 }
 
-void GPIO_Intr::gpio_remove_intr(GPIONum gpio_number)
+void GPIO_Intr::remove_callback(GPIONum gpio_number, std::string cb_name)
 {
     auto num = gpio_number.get_num();
+    auto cbs = cb_table.find(num);
+    GPIO_CHECK_THROW(cbs != cb_table.end() ? ESP_OK : ESP_FAIL);
 
-    // remove the callback from the callback table
-    GPIO_CHECK_THROW(callback_table.find(num) != callback_table.end() ? ESP_OK : ESP_FAIL);
-    callback_table.erase(num);
+    auto cb_it = find_if(cbs->second.begin(), cbs->second.end(), [cb_name](cb_table_entry_t e) {
+        return cb_name == e.first;
+    });
+    if (cb_it != cbs->second.end())
+    {
+        cbs->second.erase(cb_it);
+    }
+       
+    if (cbs->second.empty())
+    {
+        // if only one callback associated to the GPIO, remove the map entry
+        cb_table.erase(num);
 
-    // remove the handler on the driver level
-    GPIO_CHECK_THROW(gpio_isr_handler_remove(gpio_num_to_driver_num(gpio_number)));
+        // also de-register the generic callback from the driver
+        GPIO_CHECK_THROW(gpio_isr_handler_remove(gpio_num_to_driver_num(gpio_number)));
+    }
 }
 
-void GPIO_Intr::gpio_enable_intr(GPIONum gpio_number) const
+void GPIO_Intr::enable_intr(GPIONum gpio_number) const
 {
     GPIO_CHECK_THROW(gpio_intr_enable(gpio_num_to_driver_num(gpio_number)));
 }
 
-void GPIO_Intr::gpio_disable_intr(GPIONum gpio_number) const
+void GPIO_Intr::disable_intr(GPIONum gpio_number) const
 {
     GPIO_CHECK_THROW(gpio_intr_disable(gpio_num_to_driver_num(gpio_number)));
 }
