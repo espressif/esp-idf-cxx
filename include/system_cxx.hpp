@@ -31,8 +31,9 @@ class StrongValue {
 protected:
     constexpr StrongValue(ValueT value_arg) : value(value_arg) { }
 
-    ValueT get_value() const {
-        return value;
+    template<typename RawType = ValueT>
+    RawType get_value() const {
+        return static_cast<RawType>(value);
     }
 
 private:

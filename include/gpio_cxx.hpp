@@ -56,11 +56,6 @@ public:
 
     using StrongValueComparable<uint32_t>::operator==;
     using StrongValueComparable<uint32_t>::operator!=;
-
-    /**
-     * Retrieves the valid numerical representation of the GPIO number.
-     */
-    uint32_t get_num() const { return get_value(); };
 };
 
 /**
@@ -116,11 +111,6 @@ public:
 
     using StrongValueComparable<uint32_t>::operator==;
     using StrongValueComparable<uint32_t>::operator!=;
-
-    /**
-     * Retrieves the valid numerical representation of the pull mode.
-     */
-    uint32_t get_pull_mode() const { return get_value(); };
 };
 
 /**
@@ -142,11 +132,6 @@ private:
 public:
     static GPIOWakeupIntrType LOW_LEVEL();
     static GPIOWakeupIntrType HIGH_LEVEL();
-
-    /**
-     * Retrieves the valid numerical representation of the pull mode.
-     */
-    uint32_t get_level() const noexcept { return get_value(); };
 };
 
 /**
@@ -209,12 +194,6 @@ public:
 
     using StrongValueComparable<uint32_t>::operator==;
     using StrongValueComparable<uint32_t>::operator!=;
-
-    /**
-     * Retrieves the valid numerical representation of the drive strength.
-     */
-    uint32_t get_strength() const { return get_value(); };
-
 };
 
 /**

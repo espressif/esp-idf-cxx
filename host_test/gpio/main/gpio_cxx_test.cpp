@@ -59,24 +59,24 @@ TEST_CASE("drive strength out of range")
 
 TEST_CASE("drive strength as expected")
 {
-    CHECK(GPIODriveStrength::DEFAULT().get_strength() == GPIO_DRIVE_CAP_2);
-    CHECK(GPIODriveStrength::WEAK().get_strength() == GPIO_DRIVE_CAP_0);
-    CHECK(GPIODriveStrength::LESS_WEAK().get_strength() == GPIO_DRIVE_CAP_1);
-    CHECK(GPIODriveStrength::MEDIUM().get_strength() == GPIO_DRIVE_CAP_2);
-    CHECK(GPIODriveStrength::STRONGEST().get_strength() == GPIO_DRIVE_CAP_3);
+    CHECK(GPIODriveStrength::DEFAULT().get_value() == GPIO_DRIVE_CAP_2);
+    CHECK(GPIODriveStrength::WEAK().get_value() == GPIO_DRIVE_CAP_0);
+    CHECK(GPIODriveStrength::LESS_WEAK().get_value() == GPIO_DRIVE_CAP_1);
+    CHECK(GPIODriveStrength::MEDIUM().get_value() == GPIO_DRIVE_CAP_2);
+    CHECK(GPIODriveStrength::STRONGEST().get_value() == GPIO_DRIVE_CAP_3);
 }
 
 TEST_CASE("pull mode create functions work as expected")
 {
-    CHECK(GPIOPullMode::FLOATING().get_pull_mode() == 3);
-    CHECK(GPIOPullMode::PULLUP().get_pull_mode() == 0);
-    CHECK(GPIOPullMode::PULLDOWN().get_pull_mode() == 1);
+    CHECK(GPIOPullMode::FLOATING().get_value() == 3);
+    CHECK(GPIOPullMode::PULLUP().get_value() == 0);
+    CHECK(GPIOPullMode::PULLDOWN().get_value() == 1);
 }
 
 TEST_CASE("GPIOIntrType create functions work as expected")
 {
-    CHECK(GPIOWakeupIntrType::LOW_LEVEL().get_level() == GPIO_INTR_LOW_LEVEL);
-    CHECK(GPIOWakeupIntrType::HIGH_LEVEL().get_level() == GPIO_INTR_HIGH_LEVEL);
+    CHECK(GPIOWakeupIntrType::LOW_LEVEL().get_value() == GPIO_INTR_LOW_LEVEL);
+    CHECK(GPIOWakeupIntrType::HIGH_LEVEL().get_value() == GPIO_INTR_HIGH_LEVEL);
 }
 
 TEST_CASE("output resetting pin fails")
@@ -103,8 +103,8 @@ TEST_CASE("output setting direction fails")
 TEST_CASE("output constructor sets correct arguments")
 {
     CMOCK_SETUP();
-    gpio_reset_pin_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_num()), ESP_OK);
-    gpio_set_direction_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_num()), GPIO_MODE_OUTPUT, ESP_OK);
+    gpio_reset_pin_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_value()), ESP_OK);
+    gpio_set_direction_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_value()), GPIO_MODE_OUTPUT, ESP_OK);
 
     GPIO_Output gpio(VALID_GPIO);
 
@@ -114,7 +114,7 @@ TEST_CASE("output constructor sets correct arguments")
 TEST_CASE("output set high fails")
 {
     GPIOFixture fix;
-    gpio_set_level_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_num()), 1, ESP_FAIL);
+    gpio_set_level_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_value()), 1, ESP_FAIL);
 
     GPIO_Output gpio(fix.num);
 
@@ -124,7 +124,7 @@ TEST_CASE("output set high fails")
 TEST_CASE("output set high success")
 {
     GPIOFixture fix;
-    gpio_set_level_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_num()), 1, ESP_OK);
+    gpio_set_level_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_value()), 1, ESP_OK);
 
     GPIO_Output gpio(fix.num);
 
@@ -134,7 +134,7 @@ TEST_CASE("output set high success")
 TEST_CASE("output set low fails")
 {
     GPIOFixture fix;
-    gpio_set_level_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_num()), 0, ESP_FAIL);
+    gpio_set_level_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_value()), 0, ESP_FAIL);
 
     GPIO_Output gpio(fix.num);
 
@@ -144,7 +144,7 @@ TEST_CASE("output set low fails")
 TEST_CASE("output set low success")
 {
     GPIOFixture fix;
-    gpio_set_level_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_num()), 0, ESP_OK);
+    gpio_set_level_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_value()), 0, ESP_OK);
 
     GPIO_Output gpio(fix.num);
 
@@ -154,7 +154,7 @@ TEST_CASE("output set low success")
 TEST_CASE("output set drive strength")
 {
     GPIOFixture fix(VALID_GPIO);
-    gpio_set_drive_capability_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_num()), GPIO_DRIVE_CAP_0, ESP_OK);
+    gpio_set_drive_capability_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_value()), GPIO_DRIVE_CAP_0, ESP_OK);
 
     GPIO_Output gpio(fix.num);
 
@@ -187,8 +187,8 @@ TEST_CASE("GPIOInput setting direction fails")
 TEST_CASE("constructor sets correct arguments")
 {
     CMOCK_SETUP();
-    gpio_reset_pin_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_num()), ESP_OK);
-    gpio_set_direction_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_num()), GPIO_MODE_INPUT, ESP_OK);
+    gpio_reset_pin_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_value()), ESP_OK);
+    gpio_set_direction_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_value()), GPIO_MODE_INPUT, ESP_OK);
 
     GPIOInput gpio(VALID_GPIO);
 
@@ -198,7 +198,7 @@ TEST_CASE("constructor sets correct arguments")
 TEST_CASE("get level low")
 {
     GPIOFixture fix(VALID_GPIO, GPIO_MODE_INPUT);
-    gpio_get_level_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_num()), 0);
+    gpio_get_level_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_value()), 0);
 
     GPIOInput gpio(fix.num);
 
@@ -208,7 +208,7 @@ TEST_CASE("get level low")
 TEST_CASE("get level high")
 {
     GPIOFixture fix(VALID_GPIO, GPIO_MODE_INPUT);
-    gpio_get_level_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_num()), 1);
+    gpio_get_level_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_value()), 1);
 
     GPIOInput gpio(fix.num);
 
@@ -218,7 +218,7 @@ TEST_CASE("get level high")
 TEST_CASE("set pull mode fails")
 {
     GPIOFixture fix(VALID_GPIO, GPIO_MODE_INPUT);
-    gpio_set_pull_mode_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_num()), GPIO_FLOATING, ESP_FAIL);
+    gpio_set_pull_mode_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_value()), GPIO_FLOATING, ESP_FAIL);
 
     GPIOInput gpio(fix.num);
 
@@ -228,7 +228,7 @@ TEST_CASE("set pull mode fails")
 TEST_CASE("GPIOInput set pull mode floating")
 {
     GPIOFixture fix(VALID_GPIO, GPIO_MODE_INPUT);
-    gpio_set_pull_mode_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_num()), GPIO_FLOATING, ESP_OK);
+    gpio_set_pull_mode_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_value()), GPIO_FLOATING, ESP_OK);
 
     GPIOInput gpio(fix.num);
 
@@ -238,7 +238,7 @@ TEST_CASE("GPIOInput set pull mode floating")
 TEST_CASE("GPIOInput set pull mode pullup")
 {
     GPIOFixture fix(VALID_GPIO, GPIO_MODE_INPUT);
-    gpio_set_pull_mode_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_num()), GPIO_PULLUP_ONLY, ESP_OK);
+    gpio_set_pull_mode_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_value()), GPIO_PULLUP_ONLY, ESP_OK);
 
     GPIOInput gpio(fix.num);
 
@@ -248,7 +248,7 @@ TEST_CASE("GPIOInput set pull mode pullup")
 TEST_CASE("GPIOInput set pull mode pulldown")
 {
     GPIOFixture fix(VALID_GPIO, GPIO_MODE_INPUT);
-    gpio_set_pull_mode_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_num()), GPIO_PULLDOWN_ONLY, ESP_OK);
+    gpio_set_pull_mode_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_value()), GPIO_PULLDOWN_ONLY, ESP_OK);
 
     GPIOInput gpio(fix.num);
 
@@ -258,7 +258,7 @@ TEST_CASE("GPIOInput set pull mode pulldown")
 TEST_CASE("GPIOInput wake up enable fails")
 {
     GPIOFixture fix(VALID_GPIO, GPIO_MODE_INPUT);
-    gpio_wakeup_enable_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_num()), GPIO_INTR_LOW_LEVEL, ESP_FAIL);
+    gpio_wakeup_enable_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_value()), GPIO_INTR_LOW_LEVEL, ESP_FAIL);
 
     GPIOInput gpio(fix.num);
 
@@ -268,7 +268,7 @@ TEST_CASE("GPIOInput wake up enable fails")
 TEST_CASE("GPIOInput wake up enable high int")
 {
     GPIOFixture fix(VALID_GPIO, GPIO_MODE_INPUT);
-    gpio_wakeup_enable_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_num()), GPIO_INTR_HIGH_LEVEL, ESP_OK);
+    gpio_wakeup_enable_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_value()), GPIO_INTR_HIGH_LEVEL, ESP_OK);
 
     GPIOInput gpio(fix.num);
 
@@ -278,7 +278,7 @@ TEST_CASE("GPIOInput wake up enable high int")
 TEST_CASE("GPIOInput wake up disable fails")
 {
     GPIOFixture fix(VALID_GPIO, GPIO_MODE_INPUT);
-    gpio_wakeup_disable_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_num()), ESP_FAIL);
+    gpio_wakeup_disable_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_value()), ESP_FAIL);
 
     GPIOInput gpio(fix.num);
 
@@ -288,7 +288,7 @@ TEST_CASE("GPIOInput wake up disable fails")
 TEST_CASE("GPIOInput wake up disable high int")
 {
     GPIOFixture fix(VALID_GPIO, GPIO_MODE_INPUT);
-    gpio_wakeup_disable_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_num()), ESP_OK);
+    gpio_wakeup_disable_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_value()), ESP_OK);
 
     GPIOInput gpio(fix.num);
 
@@ -309,11 +309,11 @@ TEST_CASE("GPIO_OpenDrain setting direction fails")
 TEST_CASE("GPIO_OpenDrain constructor sets correct arguments")
 {
     CMOCK_SETUP();
-    gpio_reset_pin_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_num()), ESP_OK);
-    gpio_set_direction_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_num()),
+    gpio_reset_pin_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_value()), ESP_OK);
+    gpio_set_direction_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_value()),
             GPIO_MODE_INPUT,
             ESP_OK);
-    gpio_set_direction_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_num()),
+    gpio_set_direction_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_value()),
             GPIO_MODE_INPUT_OUTPUT_OD,
             ESP_OK);
 
@@ -325,10 +325,10 @@ TEST_CASE("GPIO_OpenDrain constructor sets correct arguments")
 TEST_CASE("GPIO_OpenDrain set floating fails")
 {
     GPIOFixture fix(VALID_GPIO, GPIO_MODE_INPUT);
-    gpio_set_direction_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_num()),
+    gpio_set_direction_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_value()),
             GPIO_MODE_INPUT_OUTPUT_OD,
             ESP_OK);
-    gpio_set_level_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_num()), 1, ESP_FAIL);
+    gpio_set_level_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_value()), 1, ESP_FAIL);
 
     GPIO_OpenDrain gpio(fix.num);
 
@@ -338,10 +338,10 @@ TEST_CASE("GPIO_OpenDrain set floating fails")
 TEST_CASE("GPIO_OpenDrain set floating success")
 {
     GPIOFixture fix(VALID_GPIO, GPIO_MODE_INPUT);
-    gpio_set_direction_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_num()),
+    gpio_set_direction_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_value()),
             GPIO_MODE_INPUT_OUTPUT_OD,
             ESP_OK);
-    gpio_set_level_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_num()), 1, ESP_OK);
+    gpio_set_level_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_value()), 1, ESP_OK);
 
     GPIO_OpenDrain gpio(fix.num);
 
@@ -351,10 +351,10 @@ TEST_CASE("GPIO_OpenDrain set floating success")
 TEST_CASE("GPIO_OpenDrain set low fails")
 {
     GPIOFixture fix(VALID_GPIO, GPIO_MODE_INPUT);
-    gpio_set_direction_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_num()),
+    gpio_set_direction_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_value()),
             GPIO_MODE_INPUT_OUTPUT_OD,
             ESP_OK);
-    gpio_set_level_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_num()), 0, ESP_FAIL);
+    gpio_set_level_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_value()), 0, ESP_FAIL);
 
     GPIO_OpenDrain gpio(fix.num);
 
@@ -364,10 +364,10 @@ TEST_CASE("GPIO_OpenDrain set low fails")
 TEST_CASE("GPIO_OpenDrain set low success")
 {
     GPIOFixture fix(VALID_GPIO, GPIO_MODE_INPUT);
-    gpio_set_direction_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_num()),
+    gpio_set_direction_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_value()),
             GPIO_MODE_INPUT_OUTPUT_OD,
             ESP_OK);
-    gpio_set_level_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_num()), 0, ESP_OK);
+    gpio_set_level_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_value()), 0, ESP_OK);
 
     GPIO_OpenDrain gpio(fix.num);
 
@@ -377,11 +377,11 @@ TEST_CASE("GPIO_OpenDrain set low success")
 TEST_CASE("GPIO_OpenDrain set drive strength")
 {
     GPIOFixture fix(VALID_GPIO, GPIO_MODE_INPUT);
-    gpio_set_direction_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_num()),
+    gpio_set_direction_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_value()),
             GPIO_MODE_INPUT_OUTPUT_OD,
             ESP_OK);
 
-    gpio_set_drive_capability_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_num()), GPIO_DRIVE_CAP_0, ESP_OK);
+    gpio_set_drive_capability_ExpectAndReturn(static_cast<gpio_num_t>(fix.num.get_value()), GPIO_DRIVE_CAP_0, ESP_OK);
     GPIO_OpenDrain gpio(fix.num);
 
     gpio.set_drive_strength(GPIODriveStrength::WEAK());
@@ -390,7 +390,7 @@ TEST_CASE("GPIO_OpenDrain set drive strength")
 TEST_CASE("GPIO_OpenDrain get drive strength")
 {
     GPIOFixture fix(VALID_GPIO, GPIO_MODE_INPUT);
-    gpio_set_direction_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_num()),
+    gpio_set_direction_ExpectAndReturn(static_cast<gpio_num_t>(VALID_GPIO.get_value()),
             GPIO_MODE_INPUT_OUTPUT_OD,
             ESP_OK);
     gpio_drive_cap_t drive_strength = GPIO_DRIVE_CAP_3;

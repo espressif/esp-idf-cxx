@@ -31,11 +31,6 @@ constexpr std::array<uint32_t, 0> INVALID_GPIOS = {};
 #error "No GPIOs defined for the current target"
 #endif
 
-gpio_num_t gpio_to_driver_type(const GPIONum &gpio_num)
-{
-    return static_cast<gpio_num_t>(gpio_num.get_num());
-}
-
 }
 
 GPIOException::GPIOException(esp_err_t error) : ESPException(error) { }
@@ -117,55 +112,55 @@ GPIODriveStrength GPIODriveStrength::STRONGEST()
 
 GPIOBase::GPIOBase(GPIONum num) : gpio_num(num)
 {
-    GPIO_CHECK_THROW(gpio_reset_pin(gpio_to_driver_type(gpio_num)));
+    GPIO_CHECK_THROW(gpio_reset_pin(gpio_num.get_value<gpio_num_t>()));
 }
 
 void GPIOBase::hold_en()
 {
-    GPIO_CHECK_THROW(gpio_hold_en(gpio_to_driver_type(gpio_num)));
+    GPIO_CHECK_THROW(gpio_hold_en(gpio_num.get_value<gpio_num_t>()));
 }
 
 void GPIOBase::hold_dis()
 {
-    GPIO_CHECK_THROW(gpio_hold_dis(gpio_to_driver_type(gpio_num)));
+    GPIO_CHECK_THROW(gpio_hold_dis(gpio_num.get_value<gpio_num_t>()));
 }
 
 void GPIOBase::set_drive_strength(GPIODriveStrength strength)
 {
-    GPIO_CHECK_THROW(gpio_set_drive_capability(gpio_to_driver_type(gpio_num),
-            static_cast<gpio_drive_cap_t>(strength.get_strength())));
+    GPIO_CHECK_THROW(gpio_set_drive_capability(gpio_num.get_value<gpio_num_t>(),
+                                               strength.get_value<gpio_drive_cap_t>()));
 }
 
 GPIO_Output::GPIO_Output(GPIONum num) : GPIOBase(num)
 {
-    GPIO_CHECK_THROW(gpio_set_direction(gpio_to_driver_type(gpio_num), GPIO_MODE_OUTPUT));
+    GPIO_CHECK_THROW(gpio_set_direction(gpio_num.get_value<gpio_num_t>(), GPIO_MODE_OUTPUT));
 }
 
 void GPIO_Output::set_high()
 {
-    GPIO_CHECK_THROW(gpio_set_level(gpio_to_driver_type(gpio_num), 1));
+    GPIO_CHECK_THROW(gpio_set_level(gpio_num.get_value<gpio_num_t>(), 1));
 }
 
 void GPIO_Output::set_low()
 {
-    GPIO_CHECK_THROW(gpio_set_level(gpio_to_driver_type(gpio_num), 0));
+    GPIO_CHECK_THROW(gpio_set_level(gpio_num.get_value<gpio_num_t>(), 0));
 }
 
 GPIODriveStrength GPIOBase::get_drive_strength()
 {
     gpio_drive_cap_t strength;
-    GPIO_CHECK_THROW(gpio_get_drive_capability(gpio_to_driver_type(gpio_num), &strength));
+    GPIO_CHECK_THROW(gpio_get_drive_capability(gpio_num.get_value<gpio_num_t>(), &strength));
     return GPIODriveStrength(static_cast<uint32_t>(strength));
 }
 
 GPIOInput::GPIOInput(GPIONum num) : GPIOBase(num)
 {
-    GPIO_CHECK_THROW(gpio_set_direction(gpio_to_driver_type(gpio_num), GPIO_MODE_INPUT));
+    GPIO_CHECK_THROW(gpio_set_direction(gpio_num.get_value<gpio_num_t>(), GPIO_MODE_INPUT));
 }
 
 GPIOLevel GPIOInput::get_level() const noexcept
 {
-    int level = gpio_get_level(gpio_to_driver_type(gpio_num));
+    int level = gpio_get_level(gpio_num.get_value<gpio_num_t>());
     if (level) {
         return GPIOLevel::HIGH;
     } else {
@@ -175,34 +170,34 @@ GPIOLevel GPIOInput::get_level() const noexcept
 
 void GPIOInput::set_pull_mode(GPIOPullMode mode)
 {
-    GPIO_CHECK_THROW(gpio_set_pull_mode(gpio_to_driver_type(gpio_num),
-            static_cast<gpio_pull_mode_t>(mode.get_pull_mode())));
+    GPIO_CHECK_THROW(gpio_set_pull_mode(gpio_num.get_value<gpio_num_t>(),
+                                        mode.get_value<gpio_pull_mode_t>()));
 }
 
 void GPIOInput::wakeup_enable(GPIOWakeupIntrType interrupt_type)
 {
-    GPIO_CHECK_THROW(gpio_wakeup_enable(gpio_to_driver_type(gpio_num),
-            static_cast<gpio_int_type_t>(interrupt_type.get_level())));
+    GPIO_CHECK_THROW(gpio_wakeup_enable(gpio_num.get_value<gpio_num_t>(),
+                                        interrupt_type.get_value<gpio_int_type_t>()));
 }
 
 void GPIOInput::wakeup_disable()
 {
-    GPIO_CHECK_THROW(gpio_wakeup_disable(gpio_to_driver_type(gpio_num)));
+    GPIO_CHECK_THROW(gpio_wakeup_disable(gpio_num.get_value<gpio_num_t>()));
 }
 
 GPIO_OpenDrain::GPIO_OpenDrain(GPIONum num) : GPIOInput(num)
 {
-    GPIO_CHECK_THROW(gpio_set_direction(gpio_to_driver_type(gpio_num), GPIO_MODE_INPUT_OUTPUT_OD));
+    GPIO_CHECK_THROW(gpio_set_direction(gpio_num.get_value<gpio_num_t>(), GPIO_MODE_INPUT_OUTPUT_OD));
 }
 
 void GPIO_OpenDrain::set_floating()
 {
-    GPIO_CHECK_THROW(gpio_set_level(gpio_to_driver_type(gpio_num), 1));
+    GPIO_CHECK_THROW(gpio_set_level(gpio_num.get_value<gpio_num_t>(), 1));
 }
 
 void GPIO_OpenDrain::set_low()
 {
-    GPIO_CHECK_THROW(gpio_set_level(gpio_to_driver_type(gpio_num), 0));
+    GPIO_CHECK_THROW(gpio_set_level(gpio_num.get_value<gpio_num_t>(), 0));
 }
 
 }

@@ -23,17 +23,6 @@ namespace idf {
 
 #define SPI_CHECK_THROW(err) CHECK_THROW_SPECIFIC((err), SPIException)
 
-namespace {
-
-/**
- * @brief Convenience method to convert a SPINum object into the driver type. Avoids long static casts.
- */
-spi_host_device_t spi_num_to_driver_type(const SPINum &num) noexcept {
-    return static_cast<spi_host_device_t>(num.get_spi_num());
-}
-
-}
-
 /**
  * This class wraps closely around the SPI master device driver functions.
  * It is used to hide the implementation, in particular the dependencies on the driver and HAL layer headers.
@@ -55,11 +44,11 @@ public:
     {
         spi_device_interface_config_t dev_config = {};
         dev_config.clock_speed_hz = frequency.get_value();
-        dev_config.spics_io_num = cs.get_num();
+        dev_config.spics_io_num = cs.get_value();
         dev_config.pre_cb = pr_cb;
         dev_config.post_cb = post_cb;
         dev_config.queue_size = q_size.get_size();
-        SPI_CHECK_THROW(spi_bus_add_device(spi_num_to_driver_type(spi_host), &dev_config, &handle));
+        SPI_CHECK_THROW(spi_bus_add_device(spi_host.get_value<spi_host_device_t>(), &dev_config, &handle));
     }
 
     SPIDeviceHandle(const SPIDeviceHandle &other) = delete;

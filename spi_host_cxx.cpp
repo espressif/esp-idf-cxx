@@ -32,14 +32,14 @@ SPIMaster::SPIMaster(SPINum host,
     : spi_host(host)
 {
     spi_bus_config_t bus_config = {};
-    bus_config.mosi_io_num = mosi.get_num();
-    bus_config.miso_io_num = miso.get_num();
-    bus_config.sclk_io_num = sclk.get_num();
+    bus_config.mosi_io_num = mosi.get_value();
+    bus_config.miso_io_num = miso.get_value();
+    bus_config.sclk_io_num = sclk.get_value();
     bus_config.quadwp_io_num = -1;
     bus_config.quadhd_io_num = -1;
     bus_config.max_transfer_sz = transfer_size.get_value();
 
-    SPI_CHECK_THROW(spi_bus_initialize(spi_num_to_driver_type(spi_host), &bus_config, dma_config.get_num()));
+    SPI_CHECK_THROW(spi_bus_initialize(spi_host.get_value<spi_host_device_t>(), &bus_config, dma_config.get_value()));
 }
 
 SPIMaster::SPIMaster(SPINum host,
@@ -53,19 +53,19 @@ SPIMaster::SPIMaster(SPINum host,
     : spi_host(host)
 {
     spi_bus_config_t bus_config = {};
-    bus_config.mosi_io_num = mosi.get_num();
-    bus_config.miso_io_num = miso.get_num();
-    bus_config.sclk_io_num = sclk.get_num();
-    bus_config.quadwp_io_num = qspiwp.get_num();
-    bus_config.quadhd_io_num = qspihd.get_num();
+    bus_config.mosi_io_num = mosi.get_value();
+    bus_config.miso_io_num = miso.get_value();
+    bus_config.sclk_io_num = sclk.get_value();
+    bus_config.quadwp_io_num = qspiwp.get_value();
+    bus_config.quadhd_io_num = qspihd.get_value();
     bus_config.max_transfer_sz = transfer_size.get_value();
 
-    SPI_CHECK_THROW(spi_bus_initialize(spi_num_to_driver_type(spi_host), &bus_config, dma_config.get_num()));
+    SPI_CHECK_THROW(spi_bus_initialize(spi_host.get_value<spi_host_device_t>(), &bus_config, dma_config.get_value()));
 }
 
 SPIMaster::~SPIMaster()
 {
-    spi_bus_free(spi_num_to_driver_type(spi_host));
+    spi_bus_free(spi_host.get_value<spi_host_device_t>());
 }
 
 shared_ptr<SPIDevice> SPIMaster::create_dev(CS cs, Frequency frequency)

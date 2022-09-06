@@ -23,12 +23,6 @@ static_assert(I2C_NUM_1 == 1, "I2C_NUM_1 must be equal to 1");
 #endif // SOC_I2C_NUM >= 2
 static_assert(I2C_NUM_MAX == SOC_I2C_NUM, "I2C_NUM_MAX must be equal to SOC_I2C_NUM");
 
-namespace {
-i2c_port_t i2c_num_to_driver_type(I2CNumber num) {
-    return static_cast<i2c_port_t>(num.get_num());
-}
-}
-
 esp_err_t check_i2c_num(uint32_t i2c_num) noexcept
 {
     if (i2c_num >= I2C_NUM_MAX) {
@@ -52,22 +46,12 @@ I2CException::I2CException(esp_err_t error) : ESPException(error) { }
 
 I2CTransferException::I2CTransferException(esp_err_t error) : I2CException(error) { }
 
-uint32_t I2CNumber::get_num()
-{
-    return get_value();
-}
-
 I2CAddress::I2CAddress(uint8_t addr) : StrongValueComparable<uint8_t> (addr)
 {
     esp_err_t error = check_i2c_addr(addr);
     if (error != ESP_OK) {
         throw I2CException(error);
     }
-}
-
-uint8_t I2CAddress::get_addr()
-{
-    return get_value();
 }
 
 I2CCommandLink::I2CCommandLink()
@@ -110,7 +94,7 @@ void I2CCommandLink::stop()
 
 void I2CCommandLink::execute_transfer(I2CNumber i2c_num, chrono::milliseconds driver_timeout)
 {
-    esp_err_t err = i2c_master_cmd_begin(i2c_num_to_driver_type(i2c_num), handle, driver_timeout.count() / portTICK_PERIOD_MS);
+    esp_err_t err = i2c_master_cmd_begin(i2c_num.get_value<i2c_port_t>(), handle, driver_timeout.count() / portTICK_PERIOD_MS);
     if (err != ESP_OK) {
         throw I2CTransferException(err);
     }
@@ -130,18 +114,18 @@ I2CMaster::I2CMaster(I2CNumber i2c_number,
 {
     i2c_config_t conf = {};
     conf.mode = I2C_MODE_MASTER;
-    conf.scl_io_num = scl_gpio.get_num();
+    conf.scl_io_num = scl_gpio.get_value();
     conf.scl_pullup_en = scl_pullup;
-    conf.sda_io_num = sda_gpio.get_num();
+    conf.sda_io_num = sda_gpio.get_value();
     conf.sda_pullup_en = sda_pullup;
     conf.master.clk_speed = clock_speed.get_value();
-    I2C_CHECK_THROW(i2c_param_config(i2c_num_to_driver_type(i2c_num), &conf));
-    I2C_CHECK_THROW(i2c_driver_install(i2c_num_to_driver_type(i2c_num), conf.mode, 0, 0, 0));
+    I2C_CHECK_THROW(i2c_param_config(i2c_num.get_value<i2c_port_t>(), &conf));
+    I2C_CHECK_THROW(i2c_driver_install(i2c_num.get_value<i2c_port_t>(), conf.mode, 0, 0, 0));
 }
 
 I2CMaster::~I2CMaster()
 {
-    i2c_driver_delete(i2c_num_to_driver_type(i2c_num));
+    i2c_driver_delete(i2c_num.get_value<i2c_port_t>());
 }
 
 void I2CMaster::sync_write(I2CAddress i2c_addr, const vector<uint8_t> &data)
@@ -187,24 +171,24 @@ I2CSlave::I2CSlave(I2CNumber i2c_number,
     conf.sda_io_num = sda_gpio.get_value();
     conf.sda_pullup_en = sda_pullup;
     conf.slave.addr_10bit_en = 0;
-    conf.slave.slave_addr = slave_addr.get_addr();
-    I2C_CHECK_THROW(i2c_param_config(i2c_num_to_driver_type(i2c_num), &conf));
-    I2C_CHECK_THROW(i2c_driver_install(i2c_num_to_driver_type(i2c_num), conf.mode, rx_buf_len, tx_buf_len, 0));
+    conf.slave.slave_addr = slave_addr.get_value();
+    I2C_CHECK_THROW(i2c_param_config(i2c_num.get_value<i2c_port_t>(), &conf));
+    I2C_CHECK_THROW(i2c_driver_install(i2c_num.get_value<i2c_port_t>(), conf.mode, rx_buf_len, tx_buf_len, 0));
 }
 
 I2CSlave::~I2CSlave()
 {
-    i2c_driver_delete(i2c_num_to_driver_type(i2c_num));
+    i2c_driver_delete(i2c_num.get_value<i2c_port_t>());
 }
 
 int I2CSlave::write_raw(const uint8_t *data, size_t data_len, chrono::milliseconds timeout)
 {
-    return i2c_slave_write_buffer(i2c_num_to_driver_type(i2c_num), data, data_len, (TickType_t) timeout.count() / portTICK_PERIOD_MS);
+    return i2c_slave_write_buffer(i2c_num.get_value<i2c_port_t>(), data, data_len, (TickType_t) timeout.count() / portTICK_PERIOD_MS);
 }
 
 int I2CSlave::read_raw(uint8_t *buffer, size_t buffer_len, chrono::milliseconds timeout)
 {
-    return i2c_slave_read_buffer(i2c_num_to_driver_type(i2c_num), buffer, buffer_len, (TickType_t) timeout.count() / portTICK_PERIOD_MS);
+    return i2c_slave_read_buffer(i2c_num.get_value<i2c_port_t>(), buffer, buffer_len, (TickType_t) timeout.count() / portTICK_PERIOD_MS);
 }
 #endif // CONFIG_SOC_I2C_SUPPORT_SLAVE
 

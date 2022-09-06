@@ -83,11 +83,6 @@ public:
         return I2CNumber(1);
     }
 #endif
-
-    /**
-     * Retrieves the valid numerical representation of the I2C number.
-     */
-    uint32_t get_num();
 };
 
 /**
@@ -101,11 +96,6 @@ public:
      *
      */
     explicit I2CAddress(uint8_t addr);
-
-    /**
-     * Retrieves the valid numerical representation of the I2C adress.
-     */
-    uint8_t get_addr();
 };
 
 /**
