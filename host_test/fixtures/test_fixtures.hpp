@@ -86,8 +86,8 @@ struct GPIOFixture : public CMockFixture {
     GPIOFixture(idf::GPIONum gpio_num = idf::GPIONum(18), gpio_mode_t mode = GPIO_MODE_OUTPUT)
         : CMockFixture(), num(gpio_num)
     {
-        gpio_reset_pin_ExpectAndReturn(static_cast<gpio_num_t>(num.get_num()), ESP_OK);
-        gpio_set_direction_ExpectAndReturn(static_cast<gpio_num_t>(num.get_num()), mode, ESP_OK);
+        gpio_reset_pin_ExpectAndReturn(static_cast<gpio_num_t>(num.get_value()), ESP_OK);
+        gpio_set_direction_ExpectAndReturn(static_cast<gpio_num_t>(num.get_value()), mode, ESP_OK);
     }
 
     idf::GPIONum num;

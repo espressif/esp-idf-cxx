@@ -64,18 +64,6 @@ public:
             throw SPIException(spi_num_check_result);
         }
     }
-
-    /**
-     * @brief Return the raw value of the SPI host.
-     *
-     * This should only be used when calling driver and other interfaces which don't support the C++ class.
-     *
-     * @return the raw value of the SPI host.
-     */
-    uint32_t get_spi_num() const
-    {
-        return get_value();
-    }
 };
 
 /**
@@ -134,17 +122,6 @@ public:
      * @brief Create a configuration where the driver allocates DMA.
      */
     static SPI_DMAConfig AUTO();
-
-    /**
-     * @brief Return the raw value of the DMA configuration.
-     *
-     * This should only be used when calling driver and other interfaces which don't support the C++ class.
-     *
-     * @return the raw value of the DMA configuration.
-     */
-    uint32_t get_num() const {
-        return get_value();
-    }
 };
 
 }

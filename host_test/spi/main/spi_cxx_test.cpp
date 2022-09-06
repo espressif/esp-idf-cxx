@@ -44,17 +44,17 @@ TEST_CASE("SPI gpio numbers work correctly")
 {
     GPIONum gpio_num_0(19);
     MOSI mosi_0(18);
-    MOSI mosi_1(gpio_num_0.get_num());
+    MOSI mosi_1(gpio_num_0.get_value());
     MOSI mosi_2(mosi_0);
     CHECK(mosi_0 != mosi_1);
     CHECK(mosi_2 == mosi_0);
-    CHECK(mosi_2.get_num() == 18u);
+    CHECK(mosi_2.get_value() == 18u);
 }
 
 TEST_CASE("SPI_DMAConfig valid")
 {
-    CHECK(SPI_DMAConfig::AUTO().get_num() == spi_common_dma_t::SPI_DMA_CH_AUTO);
-    CHECK(SPI_DMAConfig::DISABLED().get_num() == spi_common_dma_t::SPI_DMA_DISABLED);
+    CHECK(SPI_DMAConfig::AUTO().get_value() == spi_common_dma_t::SPI_DMA_CH_AUTO);
+    CHECK(SPI_DMAConfig::DISABLED().get_value() == spi_common_dma_t::SPI_DMA_DISABLED);
 }
 
 TEST_CASE("SPINum invalid argument")

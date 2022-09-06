@@ -32,7 +32,7 @@ extern "C" void app_main(void)
                 MISO(26),
                 SCLK(27));
 
-        shared_ptr<SPIDevice> spi_dev = master.create_dev(CS(NSS.get_num()), Frequency::MHz(1));
+        shared_ptr<SPIDevice> spi_dev = master.create_dev(CS(NSS.get_value()), Frequency::MHz(1));
 
         vector<uint8_t> write_data = {MPU9250_WHO_AM_I_REG_ADDR | READ_FLAG, 0x00};
         vector<uint8_t> result = spi_dev->transfer(write_data).get();

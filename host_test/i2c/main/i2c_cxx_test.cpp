@@ -37,7 +37,7 @@ using namespace idf;
 TEST_CASE("I2CNumber")
 {
     CMockFixture fix;
-    CHECK(I2CNumber::I2C0().get_num() == 0);
+    CHECK(I2CNumber::I2C0().get_value() == 0);
 }
 
 TEST_CASE("I2CAddr")
@@ -49,7 +49,7 @@ TEST_CASE("I2CAddr")
     CHECK_THROWS_AS(I2CAddress(128), I2CException&);
 
     I2CAddress addr(47);
-    CHECK(addr.get_addr() == 47);
+    CHECK(addr.get_value() == 47);
 }
 
 TEST_CASE("I2CMaster parameter configuration fails")
