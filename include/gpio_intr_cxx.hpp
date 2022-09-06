@@ -30,7 +30,7 @@ public:
     /**
      * @brief Add the LEVEL1 by OR operation to the
      * member variable flags
-     * 
+     *
      * @return GPIOIsrFlag& Return a reference to the class
      * to allow concatenating calls to other functions.
      */
@@ -42,7 +42,7 @@ public:
     /**
      * @brief Add the LEVEL2 by OR operation to the
      * member variable flags
-     * 
+     *
      * @return GPIOIsrFlag& Return a reference to the class
      * to allow concatenating calls to other functions.
      */
@@ -54,7 +54,7 @@ public:
     /**
      * @brief Add the LEVEL3 by OR operation to the
      * member variable flags
-     * 
+     *
      * @return GPIOIsrFlag& Return a reference to the class
      * to allow concatenating calls to other functions.
      */
@@ -66,7 +66,7 @@ public:
     /**
      * @brief Add the LEVEL4 by OR operation to the
      * member variable flags
-     * 
+     *
      * @return GPIOIsrFlag& Return a reference to the class
      * to allow concatenating calls to other functions.
      */
@@ -78,7 +78,7 @@ public:
     /**
      * @brief Add the LEVEL5 by OR operation to the
      * member variable flags
-     * 
+     *
      * @return GPIOIsrFlag& Return a reference to the class
      * to allow concatenating calls to other functions.
      */
@@ -90,7 +90,7 @@ public:
     /**
      * @brief Add the LEVEL6 by OR operation to the
      * member variable flags
-     * 
+     *
      * @return GPIOIsrFlag& Return a reference to the class
      * to allow concatenating calls to other functions.
      */
@@ -102,7 +102,7 @@ public:
     /**
      * @brief Add the NMI by OR operation to the
      * member variable flags
-     * 
+     *
      * @return GPIOIsrFlag& Return a reference to the class
      * to allow concatenating calls to other functions.
      */
@@ -114,7 +114,7 @@ public:
     /**
      * @brief Add the SHARED by OR operation to the
      * member variable flags
-     * 
+     *
      * @return GPIOIsrFlag& Return a reference to the class
      * to allow concatenating calls to other functions.
      */
@@ -126,7 +126,7 @@ public:
     /**
      * @brief Add the EDGE by OR operation to the
      * member variable flags
-     * 
+     *
      * @return GPIOIsrFlag& Return a reference to the class
      * to allow concatenating calls to other functions.
      */
@@ -138,7 +138,7 @@ public:
     /**
      * @brief Add the IRAM by OR operation to the
      * member variable flags
-     * 
+     *
      * @return GPIOIsrFlag& Return a reference to the class
      * to allow concatenating calls to other functions.
      */
@@ -150,7 +150,7 @@ public:
     /**
      * @brief Add the INTRDISABLED by OR operation to the
      * member variable flags
-     * 
+     *
      * @return GPIOIsrFlag& Return a reference to the class
      * to allow concatenating calls to other functions.
      */
@@ -161,7 +161,7 @@ public:
 
     /**
      * @brief Get the flags value
-     * 
+     *
      * @return int The ISR service flag
      */
     inline int get_value() const {
@@ -256,11 +256,11 @@ public:
      * @brief Typedef of the map used to store the different callbacks associated
      * to different GPIOs.
      */
-    typedef std::map<uint32_t, std::list<cb_table_entry_t>> callback_table_t; 
+    typedef std::map<uint32_t, std::list<cb_table_entry_t>> callback_table_t;
 
     /**
      * @brief Get the reference to the singleton
-     * 
+     *
      * @return GPIO_Intr& Reference to this instance
      */
     static GPIO_Intr& get_instance()
@@ -271,7 +271,7 @@ public:
 
     /**
      * @brief Start ISR service with the given set of flags
-     * 
+     *
      * @param flag ORed flag to be set when starting the ISR service.
      */
     void start_isr_service(GPIOIsrFlag flag);
@@ -283,21 +283,21 @@ public:
 
     /**
      * @brief Set an interrupt type on a GPIO
-     * 
+     *
      * @note calling this function will overwrite the previously
      * set interrupt type if any.
-     * 
-     * @param gpio_number the GPIO on which to set the interrupt type 
+     *
+     * @param gpio_number the GPIO on which to set the interrupt type
      * @param type the interrupt type to be set on the given GPIO
      */
     void set_type(GPIONum gpio_number, GPIOIntrType type);
 
     /**
      * @brief add an interrupt callback on a given GPIO.
-     * 
+     *
      * @note If no previous call to set_type(type)
      * was done, this function will throw an exception.
-     * 
+     *
      * @param gpio_input The GPIO number
      * @param cb_name The name given to the callback used to index it in the callback table
      * @param func_cb The callback function called on interrupt on the given GPIO
@@ -307,10 +307,10 @@ public:
     /**
      * @brief Disable interrupt on the given GPIO number and remove the
      * associated handler.
-     * 
+     *
      * @note if no user callback is present in the list after this one is removed,
      * also de-register the generic callback from the gpio driver
-     * 
+     *
      * @param gpio_number The GPIO number on which to remove the interrupt service
      * @param cb_name The callback name associated to the callback to remove from the list
      * of registered callbacks to the given GPIo.
@@ -319,14 +319,14 @@ public:
 
     /**
      * @brief Enable the interrupts on a given GPIO
-     * 
+     *
      * @param gpio_input The GPIO number
      */
     void enable_intr(GPIONum gpio_number) const;
 
     /**
      * @brief Disable interrupts on a given GPIO
-     * 
+     *
      * @param gpio_input The GPIO number
      */
     void disable_intr(GPIONum gpio_number) const;

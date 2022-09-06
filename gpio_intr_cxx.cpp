@@ -14,7 +14,7 @@ namespace {
 
 /**
  * @brief Return the converted GPIO interrupt type usable by the C driver
- * 
+ *
  * @param num The CXX representation of the GPIO interrupt type
  * @return gpio_num_t The C driver representation of the GPIO interrupt type
  */
@@ -24,7 +24,7 @@ gpio_int_type_t gpio_int_type_to_driver_type(GPIOIntrType type) {
 
 /**
  * @brief Return the converted GPIO number usable by the C driver
- * 
+ *
  * @param num The CXX representation of the GPIO number
  * @return gpio_num_t The C driver representation of the GPIO number
  */
@@ -34,10 +34,10 @@ gpio_num_t gpio_num_to_driver_num(GPIONum num) {
 
 /**
  * @brief Generic callback registered to the gpio driver
- * 
+ *
  * @todo Remove this hack.
- * 
- * @param arg Represents the GPIO number triggering the interrupt 
+ *
+ * @param arg Represents the GPIO number triggering the interrupt
  */
 static void generic_callback(void *arg)
 {
@@ -54,13 +54,14 @@ static void generic_callback(void *arg)
     if (cbs != table.end())
     {
         for (auto &cb: cbs->second) {
+
             cb.second(GPIONum(gpio_number));
         }
     }
 }
 } // namespace
 
-GPIO_Intr::GPIO_Intr(): isr_service_started(false), 
+GPIO_Intr::GPIO_Intr(): isr_service_started(false),
                         interrupt_type_set(false)
 {
     // nothing to do here
@@ -127,7 +128,7 @@ void GPIO_Intr::remove_callback(GPIONum gpio_number, std::string cb_name)
     {
         cbs->second.erase(cb_it);
     }
-       
+
     if (cbs->second.empty())
     {
         // if only one callback associated to the GPIO, remove the map entry
