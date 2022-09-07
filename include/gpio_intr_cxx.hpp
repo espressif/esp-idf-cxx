@@ -360,6 +360,13 @@ private:
     GPIO_Intr();
     GPIO_Intr(const GPIO_Intr&);
     GPIO_Intr& operator=(const GPIO_Intr&);
+
+    /**
+     * @brief Generic callback registered to the gpio driver
+     *
+     * @param arg Represents the GPIO number triggering the interrupt
+     */
+    static void generic_callback(void *arg);
 };
 
 /**
