@@ -57,7 +57,7 @@ jobs:
       - name: Install Python packages
         env:
           PIP_EXTRA_INDEX_URL: "https://www.piwheels.org/simple"
-        run: pip install pytest-embedded pytest-embedded-serial-esp pytest-embedded-idf
+        run: pip install --only-binary cryptography pytest-embedded pytest-embedded-serial-esp pytest-embedded-idf
       - name: Run Test App on ${{ matrix.idf_target }}
         working-directory: test_apps/${{ matrix.test_app_name }}
         run: pytest -s --junit-xml=./test_app_results_${{ matrix.test_app_name }}_${{ matrix.idf_target }}_${{ matrix.idf_ver }}.xml --embedded-services esp,idf --target=${{ matrix.idf_target }}
