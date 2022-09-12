@@ -10,10 +10,7 @@
 
 #include <cstdint>
 #include <functional>
-#include <iostream>
-#include <map>
 #include <list>
-#include <utility>
 #include <string>
 
 #include "gpio_cxx.hpp"
@@ -233,40 +230,134 @@ public:
     }
 };
 
-/**
- * @brief GPIO interrupt singleton. Used to register interrupt callback
- * on given GPIOs.
- */
-class GPIO_Intr {
+class GPIOIntr {
 public:
+    GPIOIntr(const GPIONum gpio_number): gpio_num(gpio_number)
+    {
+    }
+
     /**
      * @brief Callback footprint declaration for the
      * GPIO interrupt users.
      * @todo Define what will be useful to store in the parameter. For
      * now it is just the gpio_number but we might want to send more.
      */
-    typedef std::function<void(GPIONum)> interrupt_callback;
+    typedef std::function<void(GPIONum)> interrupt_callback_t;
 
+    /**
+     * @brief Set the interrupt type on the GPIO input
+     * 
+     * @note calling this function will overwrite the previously
+     * set interrupt type if any.
+     * 
+     * @param type the interrupt type to be set
+     */
+    void set_type(const GPIOIntrType type);
+
+    /**
+     * @brief The callback to register to the driver
+     * 
+     * @param arg Argument passed in the callback, set when registering this callback
+     */
+    void driver_handler(void);
+
+    /**
+     * @brief Add a user callback in the list of registered callbacks
+     * 
+     * @param name The name of the callback
+     * @param func_cb The user callback
+     */
+    void add_callback(std::string name, interrupt_callback_t func_cb);
+
+    /**
+     * @brief Remove a user callbacks based on its name in the list
+     * 
+     * @note If no callback is found, this method as no effect
+     * 
+     * @param cb_name the name of the callback to be removed
+     */
+    void remove_callback(std::string cb_name);
+
+    /**
+     * @brief remove all the user registered callbacks and unregister
+     * the driver_handler to the gpio driver.
+     */
+    void remove_all_callbacks();
+
+    /**
+     * @brief Enable the interrupts on a given GPIO
+     */
+    void enable_intr() const;
+
+    /**
+     * @brief Disable interrupts on a given GPIO
+     */
+    void disable_intr() const;
+
+    /**
+     * @brief Function called form the gpio driver on interrupt with
+     * the pointer to the appropriate instance of GPIOIntr 
+     * as parameter.
+     * 
+     * @param class_ptr The pointer to the instance of GPIOIntr
+     */
+    static void hdlr_bounce(void* class_ptr);
+
+    /**
+     * @brief Utility method returning the gpio number of this instance of
+     * GPIOIntr
+     * 
+     * @return const GPIONum& The gpio number associated to this instance of GPIOIntr
+     */
+    inline const GPIONum& get_gpio_number() const { return gpio_num; }
+
+private:
     /**
      * @brief Pair of callback ID and callback function
      */
-    typedef std::pair<std::string, interrupt_callback> cb_table_entry_t;
+    typedef std::pair<std::string, interrupt_callback_t> cb_table_entry_t;
 
     /**
-     * @brief Typedef of the map used to store the different callbacks associated
-     * to different GPIOs.
+     * @brief List of callbacks registered by the user
      */
-    typedef std::map<uint32_t, std::list<cb_table_entry_t>> callback_table_t;
+    typedef std::list<cb_table_entry_t> user_cb_table_t;
 
+    /**
+     * @brief List of registered user callbacks
+     */
+    user_cb_table_t cb_table;
+
+    /**
+     * @brief Reference to the input GPIO on which the interrupt is
+     * defined.
+     */
+    GPIONum gpio_num;
+
+    /**
+     * @brief Returns the iterator in cb_table where the callback with the given name
+     * was found, returns the end of the list if no callback was found
+     * 
+     * @param cb_name The name of the callback to be found 
+     * @return std::iterator<user_cb_table_t> Iterator of the callback in cb_table
+     */
+    user_cb_table_t::iterator find_user_callback(std::string cb_name);
+};
+
+/**
+ * @brief GPIO interrupt singleton. Used to register interrupt callback
+ * on given GPIOs.
+ */
+class GPIOIsr {
+public:
     /**
      * @brief Get the reference to the singleton
      *
-     * @return GPIO_Intr& Reference to this instance
+     * @return GPIOIsr& Reference to this instance
      */
-    static GPIO_Intr& get_instance()
+    static GPIOIsr& get_instance()
     {
-        static GPIO_Intr gpio_intr;
-        return gpio_intr;
+        static GPIOIsr gpio_isr;
+        return gpio_isr;
     }
 
     /**
@@ -274,70 +365,12 @@ public:
      *
      * @param flag ORed flag to be set when starting the ISR service.
      */
-    void start_isr_service(GPIOIsrFlag flag);
+    void start_service(GPIOIsrFlag flag);
 
     /**
      * @brief Stop the ISR service
      */
-    void stop_isr_service(void);
-
-    /**
-     * @brief Set an interrupt type on a GPIO
-     *
-     * @note calling this function will overwrite the previously
-     * set interrupt type if any.
-     *
-     * @param gpio_number the GPIO on which to set the interrupt type
-     * @param type the interrupt type to be set on the given GPIO
-     */
-    void set_type(GPIONum gpio_number, GPIOIntrType type);
-
-    /**
-     * @brief add an interrupt callback on a given GPIO.
-     *
-     * @note If no previous call to set_type(type)
-     * was done, this function will throw an exception.
-     *
-     * @param gpio_input The GPIO number
-     * @param cb_name The name given to the callback used to index it in the callback table
-     * @param func_cb The callback function called on interrupt on the given GPIO
-     */
-    void add_callback(GPIONum gpio_number, std::string cb_name, interrupt_callback func_cb);
-
-    /**
-     * @brief Disable interrupt on the given GPIO number and remove the
-     * associated handler.
-     *
-     * @note if no user callback is present in the list after this one is removed,
-     * also de-register the generic callback from the gpio driver
-     *
-     * @param gpio_number The GPIO number on which to remove the interrupt service
-     * @param cb_name The callback name associated to the callback to remove from the list
-     * of registered callbacks to the given GPIo.
-     */
-    void remove_callback(GPIONum gpio_number, std::string cb_name);
-
-    /**
-     * @brief Enable the interrupts on a given GPIO
-     *
-     * @param gpio_input The GPIO number
-     */
-    void enable_intr(GPIONum gpio_number) const;
-
-    /**
-     * @brief Disable interrupts on a given GPIO
-     *
-     * @param gpio_input The GPIO number
-     */
-    void disable_intr(GPIONum gpio_number) const;
-
-    /**
-     * @brief Get the callback table to find what user defined callback to call
-     * from the generic callback function defined static in gpio_intr_cxx.cpp
-     *
-     * @return callback_table_t& The callback map addressed by GPIO number
-     */
-    inline callback_table_t& get_table() {return cb_table; }
+    void stop_service(void);
 
 private:
 
@@ -347,32 +380,15 @@ private:
      */
     bool isr_service_started;
 
-    /**
-     * @brief hold the information whether an interrupt type was set or not
-     */
-    bool interrupt_type_set;
-
-    /**
-     * @brief Map of user callback associated to GPIO number
-     */
-    callback_table_t cb_table;
-
-    GPIO_Intr();
-    GPIO_Intr(const GPIO_Intr&);
-    GPIO_Intr& operator=(const GPIO_Intr&);
-
-    /**
-     * @brief Generic callback registered to the gpio driver
-     *
-     * @param arg Represents the GPIO number triggering the interrupt
-     */
-    static void generic_callback(void *arg);
+    GPIOIsr();
+    GPIOIsr(const GPIOIsr&);
+    GPIOIsr& operator=(const GPIOIsr&);
 };
 
 /**
- * @brief Directly accessible by user to avoid calling GPIO_intr::get_instance() all the time.
+ * @brief Directly accessible by user to avoid calling GPIOIsr::get_instance() all the time.
  */
-static GPIO_Intr &GPIOIntr = GPIO_Intr::get_instance();
+static GPIOIsr &GPIO_Isr = GPIOIsr::get_instance();
 
 } // namespace idf
 

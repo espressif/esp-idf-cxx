@@ -268,6 +268,8 @@ protected:
      * @brief The number of the configured GPIO pin.
      */
     GPIONum gpio_num;
+
+    inline const GPIONum& get_gpio_num(void) const noexcept { return gpio_num; }
 };
 
 /**
@@ -347,6 +349,11 @@ public:
      * @throws GPIOException if the underlying driver function fails.
      */
     void wakeup_disable();
+
+    using GPIOBase::set_drive_strength;
+    using GPIOBase::get_drive_strength;
+
+    using GPIOBase::get_gpio_num;
 };
 
 /**

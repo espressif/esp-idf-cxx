@@ -7,9 +7,12 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 
-#include <iostream>
 #include <thread>
-#include <functional>
+#include <cstring>
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
+#include "freertos/task.h"
 
 #include "gpio_cxx.hpp"
 #include "gpio_intr_cxx.hpp"
@@ -18,76 +21,85 @@ using namespace idf;
 using namespace std;
 using namespace std::placeholders;
 
-#define GPIO_NUM_A 10
-#define GPIO_NUM_B 11
+#define GPIO_NUM_A 12
+#define GPIO_NUM_B 13
 
-class TriggerCounter {
+class IntHdlr {
 public:
-    TriggerCounter(GPIONum _gpio_num) : trigger_counter(0), gpio_num(_gpio_num) {
-        printf("trigger count initialized\n");
-    }
+    IntHdlr(const GPIONum gpio_num, const GPIOPullMode mode, const GPIODriveStrength strength, const GPIOIntrType type):
+        gpio_input(gpio_num),
+        gpio_intr(gpio_num),
+        counter(0),
+        missed_counter(0)
+    {
+        gpio_input.set_pull_mode(mode);
+        gpio_input.set_drive_strength(strength);
 
-    inline uint16_t get_interrupt_counter() { return trigger_counter; }
-
-    inline void callback(GPIONum gpio_num) { trigger_counter++; }
-
-    inline void init(std::string _cb_name) {
-        cout << "initializing interrupt on GPIO " << gpio_num.get_num() << endl;
-        cb_name = _cb_name;
         try {
-            GPIOIntr.start_isr_service(GPIOIsrFlag().LEVEL1().LEVEL2());
-            GPIOIntr.set_type(gpio_num, GPIOIntrType::POSEDGE());
-            GPIOIntr.add_callback(gpio_num, cb_name, std::bind(&TriggerCounter::callback, this, _1));
+            gpio_intr.set_type(type);
+            gpio_intr.add_callback("some name", std::bind(&IntHdlr::callback, this, _1));
         }
         catch (const GPIOException& e) {
-            printf("Error 0x%x occured\n", e.error);
+            printf("[0x%x] occured: %s\n", e.error, e.what());
         }
     }
 
-    inline void remove_interrupt() {
-        try {
-            GPIOIntr.remove_callback(gpio_num, cb_name);
+    size_t get_counter() const 
+    {
+        return counter;
+    }
+
+    size_t get_missed() const
+    {
+        return missed_counter;
+    }
+
+    void callback(GPIONum gpio_num)
+    {
+        if (gpio_input.get_gpio_num() == gpio_num)
+        {
+            counter++;
         }
-        catch (const GPIOException& e) {
-            printf("Error 0x%x occured\n", e.error);
+        else{
+            missed_counter++;
         }
     }
 private:
-    uint16_t trigger_counter;
-    std::string cb_name;
-    GPIONum gpio_num;
+    GPIOInput gpio_input;
+    GPIOIntr gpio_intr;
+    size_t counter;
+    size_t missed_counter;
 };
 
 extern "C" void app_main(void)
 {
-    GPIONum gpio_num_a(GPIO_NUM_A);
-    GPIONum gpio_num_b(GPIO_NUM_B);
+    // install ISR service before any interrupt related code
+    try {
+        GPIO_Isr.start_service(GPIOIsrFlag().LEVEL1());
+    }
+    catch (const GPIOException& e) {
+        printf("[0x%x]: %s\n", e.error, e.what());
+    }
 
-    // initialize the GPIOs that will trigger the interrupts on level high
-    GPIOInput gpio_i_a(gpio_num_a);
-    gpio_i_a.set_pull_mode(GPIOPullMode::PULLDOWN());
+    IntHdlr hdlr{GPIONum(GPIO_NUM_A), GPIOPullMode::PULLDOWN(), GPIODriveStrength::STRONGEST(), GPIOIntrType::POSEDGE()};
 
-    GPIOInput gpio_i_b(gpio_num_b);
-    gpio_i_b.set_pull_mode(GPIOPullMode::PULLDOWN());
-
-    // create the trigger counter class
-    TriggerCounter trig_counter_a(gpio_num_a);
-    trig_counter_a.init("cb_name_a");
-
-    TriggerCounter trig_counter_b(gpio_num_b);
-    trig_counter_b.init("cb_name_b");
-
-    uint16_t prev_counter_a = 0;
-    uint16_t prev_counter_b = 0;
-    while (true) {
-        uint16_t counter_a = trig_counter_a.get_interrupt_counter();
-        uint16_t counter_b = trig_counter_b.get_interrupt_counter();
-        if (counter_a != prev_counter_a || counter_b != prev_counter_b)
+    size_t cur_cnt = 0;
+    size_t cur_missed = 0;
+    while(1) {
+        size_t cnt = hdlr.get_counter();
+        if (cur_cnt != cnt)
         {
-            prev_counter_a = counter_a;
-            prev_counter_b = counter_b;
-            printf("GPIO 10: %d | GPIO 11: %d\n", counter_a, counter_b);
+            cur_cnt = cnt;
+            printf("interrupt occurred %d\n", cnt);
         }
+
+        size_t missed = hdlr.get_missed();
+        if (cur_missed != missed)
+        {
+            cur_missed = missed;
+            printf("missed interrupt occurred %d\n", missed);
+        }
+
         this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }
