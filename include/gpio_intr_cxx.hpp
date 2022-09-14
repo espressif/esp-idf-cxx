@@ -61,54 +61,6 @@ public:
     }
 
     /**
-     * @brief Add the LEVEL4 by OR operation to the
-     * member variable flags
-     *
-     * @return GPIOIsrFlag& Return a reference to the class
-     * to allow concatenating calls to other functions.
-     */
-    constexpr GPIOIsrFlag& LEVEL4() {
-        add_flag(1<<4);
-        return *this;
-    }
-
-    /**
-     * @brief Add the LEVEL5 by OR operation to the
-     * member variable flags
-     *
-     * @return GPIOIsrFlag& Return a reference to the class
-     * to allow concatenating calls to other functions.
-     */
-    constexpr GPIOIsrFlag& LEVEL5() {
-        add_flag(1<<5);
-        return *this;
-    }
-
-    /**
-     * @brief Add the LEVEL6 by OR operation to the
-     * member variable flags
-     *
-     * @return GPIOIsrFlag& Return a reference to the class
-     * to allow concatenating calls to other functions.
-     */
-    constexpr GPIOIsrFlag& LEVEL6() {
-        add_flag(1<<6);
-        return *this;
-    }
-
-    /**
-     * @brief Add the NMI by OR operation to the
-     * member variable flags
-     *
-     * @return GPIOIsrFlag& Return a reference to the class
-     * to allow concatenating calls to other functions.
-     */
-    constexpr GPIOIsrFlag& NMI() {
-        add_flag(1<<7);
-        return *this;
-    }
-
-    /**
      * @brief Add the SHARED by OR operation to the
      * member variable flags
      *
