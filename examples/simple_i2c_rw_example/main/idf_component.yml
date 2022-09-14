@@ -1,6 +1,6 @@
 dependencies:
   idf:
     version: ">=5.0"
-  esp-idf-cxx:
-    path: ../../../
-    version: ">=0.1"
+  espressif/esp-idf-cxx:
+    override_path: ../../../
+    version: "^1.0.0"
