@@ -189,13 +189,31 @@ public:
     }
 
     /**
-     * @brief Callback footprint declaration for the
-     * GPIO interrupt users.
-     * @todo Define what will be useful to store in the parameter. For
-     * now it is just the gpio_number but we might want to send more.
+     * @brief Callback footprint declaration for the GPIO interrupt users.
      */
     typedef std::function<void(GPIONum)> interrupt_callback_t;
 
+    /**
+     * @brief Function registered and called form the GPIO driver
+     * on interrupt with the pointer to the appropriate instance
+     * of GPIOIntr passed as parameter.
+     * 
+     * @note This function casts the void* class_ptr to GPIOIntr* and
+     * calls the driver_handler thus avoiding keeping a table of GPIOIntr
+     * instances and finding the correct instance every time.
+     * 
+     * @param class_ptr The pointer to the instance of GPIOIntr
+     */
+    static void hdlr_bounce(void* class_ptr);
+
+    /**
+     * @brief The actual callback triggered on interrupt.
+     * 
+     * @note This callback goes through cb_table (list of registered
+     * user callbacks) and sequentially calls them.
+     */
+    void driver_handler(void);
+    
     /**
      * @brief Set the interrupt type on the GPIO input
      * 
@@ -207,14 +225,11 @@ public:
     void set_type(const GPIOIntrType type);
 
     /**
-     * @brief The callback to register to the driver
-     * 
-     * @param arg Argument passed in the callback, set when registering this callback
-     */
-    void driver_handler(void);
-
-    /**
      * @brief Add a user callback in the list of registered callbacks
+     * 
+     * @note If the list of user callbacks is empty when this method is
+     * called, this method also register the driver_handler callback to
+     * the GPIO driver
      * 
      * @param name The name of the callback
      * @param func_cb The user callback
@@ -224,44 +239,33 @@ public:
     /**
      * @brief Remove a user callbacks based on its name in the list
      * 
-     * @note If no callback is found, this method as no effect
+     * @note If no callback is found, this method as no effect.
+     * If the method removes the last registered user callback
+     * from the list, it also unregister the driver_handler callback
+     * to the GPIO driver.
      * 
      * @param cb_name the name of the callback to be removed
      */
     void remove_callback(std::string cb_name);
 
     /**
-     * @brief remove all the user registered callbacks and unregister
-     * the driver_handler to the gpio driver.
+     * @brief Remove all the user registered callbacks and unregister
+     * the driver_handler to the GPIO driver.
+     * 
+     * @note This method also unregister the driver_handler callback
+     * to the GPIO driver
      */
     void remove_all_callbacks();
 
     /**
-     * @brief Enable the interrupts on a given GPIO
+     * @brief Enable the interrupts on the GPIO
      */
     void enable_intr() const;
 
     /**
-     * @brief Disable interrupts on a given GPIO
+     * @brief Disable interrupts on the GPIO
      */
     void disable_intr() const;
-
-    /**
-     * @brief Function called form the gpio driver on interrupt with
-     * the pointer to the appropriate instance of GPIOIntr 
-     * as parameter.
-     * 
-     * @param class_ptr The pointer to the instance of GPIOIntr
-     */
-    static void hdlr_bounce(void* class_ptr);
-
-    /**
-     * @brief Utility method returning the gpio number of this instance of
-     * GPIOIntr
-     * 
-     * @return const GPIONum& The gpio number associated to this instance of GPIOIntr
-     */
-    inline const GPIONum& get_gpio_number() const { return gpio_num; }
 
 private:
     /**
@@ -270,7 +274,7 @@ private:
     typedef std::pair<std::string, interrupt_callback_t> cb_table_entry_t;
 
     /**
-     * @brief List of callbacks registered by the user
+     * @brief Typedef for the list of callbacks registered by the user
      */
     typedef std::list<cb_table_entry_t> user_cb_table_t;
 
@@ -315,7 +319,7 @@ public:
     /**
      * @brief Start ISR service with the given set of flags
      *
-     * @param flag ORed flag to be set when starting the ISR service.
+     * @param flag ORed flags to be set when starting the ISR service.
      */
     void start_service(GPIOIsrFlag flag);
 
@@ -327,7 +331,7 @@ public:
 private:
 
     /**
-     * @brief Hold information about whether or not the underlying gpio isr service
+     * @brief Hold information about whether or not the underlying GPIO isr service
      * was started.
      */
     bool isr_service_started;
