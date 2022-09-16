@@ -27,21 +27,10 @@ using namespace std::placeholders;
 class IntHdlr {
 public:
     IntHdlr(const GPIONum gpio_num, const GPIOPullMode mode, const GPIODriveStrength strength, const GPIOIntrType type):
-        gpio_input(gpio_num),
-        gpio_intr(gpio_num),
+        gpio_intr(gpio_num, type, mode, strength, "name", std::bind(&IntHdlr::callback, this, _1)),
         counter(0),
         missed_counter(0)
     {
-        gpio_input.set_pull_mode(mode);
-        gpio_input.set_drive_strength(strength);
-
-        try {
-            gpio_intr.set_type(type);
-            gpio_intr.add_callback("some name", std::bind(&IntHdlr::callback, this, _1));
-        }
-        catch (const GPIOException& e) {
-            printf("[0x%x] occured: %s\n", e.error, e.what());
-        }
     }
 
     size_t get_counter() const 
@@ -56,7 +45,7 @@ public:
 
     void callback(GPIONum gpio_num)
     {
-        if (gpio_input.get_gpio_num() == gpio_num)
+        if (gpio_intr.get_gpio_num() == gpio_num)
         {
             counter++;
         }
@@ -65,7 +54,6 @@ public:
         }
     }
 private:
-    GPIOInput gpio_input;
     GPIOIntr gpio_intr;
     size_t counter;
     size_t missed_counter;

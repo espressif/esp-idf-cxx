@@ -182,16 +182,26 @@ public:
     }
 };
 
-class GPIOIntr {
+class GPIOIntr: public GPIOInput {
 public:
-    GPIOIntr(const GPIONum gpio_number): gpio_num(gpio_number)
-    {
-    }
-
     /**
      * @brief Callback footprint declaration for the GPIO interrupt users.
      */
     typedef std::function<void(GPIONum)> interrupt_callback_t;
+
+    /**
+     * @brief Constructor of GPIOIntr
+     * 
+     * @param gpio_number The GPIO input GPIO number on which to set the interrupt
+     * @param type The interrupt type to set
+     * @param mode The pull mode to set on the GPIO input
+     * @param strength The internal pull resistor strength to set
+     * @param cb_name The callback name 
+     * @param cb The callback to be triggered on interrupt
+     */
+    GPIOIntr(const GPIONum gpio_number, const GPIOIntrType type,
+             const GPIOPullMode mode, const GPIODriveStrength strength,
+             std::string cb_name, interrupt_callback_t cb);
     
     /**
      * @brief Set the interrupt type on the GPIO input
@@ -261,12 +271,6 @@ private:
      * @brief List of registered user callbacks
      */
     user_cb_table_t cb_table;
-
-    /**
-     * @brief Reference to the input GPIO on which the interrupt is
-     * defined.
-     */
-    GPIONum gpio_num;
 
     /**
      * @brief Returns the iterator in cb_table where the callback with the given name

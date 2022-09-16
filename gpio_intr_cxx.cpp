@@ -20,6 +20,20 @@ void stop_service(void)
     gpio_uninstall_isr_service();
 }
 
+GPIOIntr::GPIOIntr(const GPIONum gpio_number,
+                   const GPIOIntrType type,
+                   const GPIOPullMode mode,
+                   const GPIODriveStrength strength,
+                   std::string cb_name,
+                   interrupt_callback_t cb):
+GPIOInput(gpio_number)
+{
+    set_pull_mode(mode);
+    set_drive_strength(strength);
+    set_type(type);
+    add_callback(cb_name, cb);
+}
+
 void GPIOIntr::set_type(const GPIOIntrType type)
 {
     GPIO_CHECK_THROW(gpio_set_intr_type(gpio_num.get_value<gpio_num_t>(),
