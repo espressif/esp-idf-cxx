@@ -27,7 +27,7 @@ using namespace std::placeholders;
 class IntHdlr {
 public:
     IntHdlr(const GPIONum gpio_num, const GPIOPullMode mode, const GPIODriveStrength strength, const GPIOIntrType type):
-        gpio_intr(gpio_num, type, mode, strength, "name", std::bind(&IntHdlr::callback, this, _1)),
+        gpio_intr(gpio_num, mode, strength, type, "name", std::bind(&IntHdlr::callback, this, _1)),
         counter(0),
         missed_counter(0)
     {

@@ -321,6 +321,15 @@ public:
     GPIOInput(GPIONum num);
 
     /**
+     * @brief Constructs and fully configure a GPIO as input
+     * 
+     * @param num GPIO pin number of the GPIO to be configured.
+     * @param mode The pull mode to configure on the GPIO
+     * @param strength The internal pull resistor strength to setup on the GPIO 
+     */
+    GPIOInput(const GPIONum num, const GPIOPullMode mode, const GPIODriveStrength strength);
+
+    /**
      * @brief Read the current level of the GPIO.
      *
      * @return The GPIO current level of the GPIO.

@@ -156,6 +156,13 @@ GPIOInput::GPIOInput(GPIONum num) : GPIOBase(num)
     GPIO_CHECK_THROW(gpio_set_direction(gpio_num.get_value<gpio_num_t>(), GPIO_MODE_INPUT));
 }
 
+GPIOInput::GPIOInput(const GPIONum num, const GPIOPullMode mode, const GPIODriveStrength strength)
+    : GPIOInput(num)
+{
+    set_pull_mode(mode);
+    set_drive_strength(strength);
+}
+
 GPIOLevel GPIOInput::get_level() const noexcept
 {
     int level = gpio_get_level(gpio_num.get_value<gpio_num_t>());

@@ -199,9 +199,8 @@ public:
      * @param cb_name The callback name 
      * @param cb The callback to be triggered on interrupt
      */
-    GPIOIntr(const GPIONum gpio_number, const GPIOIntrType type,
-             const GPIOPullMode mode, const GPIODriveStrength strength,
-             std::string cb_name, interrupt_callback_t cb);
+    GPIOIntr(const GPIONum gpio_number, const GPIOPullMode mode, const GPIODriveStrength strength,
+             const GPIOIntrType type, std::string cb_name, interrupt_callback_t cb);
     
     /**
      * @brief Set the interrupt type on the GPIO input

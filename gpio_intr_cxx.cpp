@@ -21,15 +21,13 @@ void stop_service(void)
 }
 
 GPIOIntr::GPIOIntr(const GPIONum gpio_number,
-                   const GPIOIntrType type,
                    const GPIOPullMode mode,
                    const GPIODriveStrength strength,
+                   const GPIOIntrType type,
                    std::string cb_name,
                    interrupt_callback_t cb):
-GPIOInput(gpio_number)
+GPIOInput(gpio_number, mode, strength)
 {
-    set_pull_mode(mode);
-    set_drive_strength(strength);
     set_type(type);
     add_callback(cb_name, cb);
 }
