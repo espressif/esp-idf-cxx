@@ -192,27 +192,6 @@ public:
      * @brief Callback footprint declaration for the GPIO interrupt users.
      */
     typedef std::function<void(GPIONum)> interrupt_callback_t;
-
-    /**
-     * @brief Function registered and called form the GPIO driver
-     * on interrupt with the pointer to the appropriate instance
-     * of GPIOIntr passed as parameter.
-     * 
-     * @note This function casts the void* class_ptr to GPIOIntr* and
-     * calls the driver_handler thus avoiding keeping a table of GPIOIntr
-     * instances and finding the correct instance every time.
-     * 
-     * @param class_ptr The pointer to the instance of GPIOIntr
-     */
-    static void hdlr_bounce(void* class_ptr);
-
-    /**
-     * @brief The actual callback triggered on interrupt.
-     * 
-     * @note This callback goes through cb_table (list of registered
-     * user callbacks) and sequentially calls them.
-     */
-    void driver_handler(void);
     
     /**
      * @brief Set the interrupt type on the GPIO input
@@ -297,54 +276,31 @@ private:
      * @return std::iterator<user_cb_table_t> Iterator of the callback in cb_table
      */
     user_cb_table_t::iterator find_user_callback(std::string cb_name);
+
+    /**
+     * @brief Function registered and called form the GPIO driver
+     * on interrupt with the pointer to the appropriate instance
+     * of GPIOIntr passed as parameter.
+     * 
+     * @note This function casts the void* class_ptr to GPIOIntr* and
+     * calls the driver_handler thus avoiding keeping a table of GPIOIntr
+     * instances and finding the correct instance every time.
+     * 
+     * @param class_ptr The pointer to the instance of GPIOIntr
+     */
+    static void hdlr_bounce(void* class_ptr);
+
+    /**
+     * @brief The actual callback triggered on interrupt.
+     * 
+     * @note This callback goes through cb_table (list of registered
+     * user callbacks) and sequentially calls them.
+     */
+    void driver_handler(void);
 };
 
-/**
- * @brief GPIO interrupt singleton. Used to register interrupt callback
- * on given GPIOs.
- */
-class GPIOIsr {
-public:
-    /**
-     * @brief Get the reference to the singleton
-     *
-     * @return GPIOIsr& Reference to this instance
-     */
-    static GPIOIsr& get_instance()
-    {
-        static GPIOIsr gpio_isr;
-        return gpio_isr;
-    }
-
-    /**
-     * @brief Start ISR service with the given set of flags
-     *
-     * @param flag ORed flags to be set when starting the ISR service.
-     */
-    void start_service(GPIOIsrFlag flag);
-
-    /**
-     * @brief Stop the ISR service
-     */
-    void stop_service(void);
-
-private:
-
-    /**
-     * @brief Hold information about whether or not the underlying GPIO isr service
-     * was started.
-     */
-    bool isr_service_started;
-
-    GPIOIsr();
-    GPIOIsr(const GPIOIsr&);
-    GPIOIsr& operator=(const GPIOIsr&);
-};
-
-/**
- * @brief Directly accessible by user to avoid calling GPIOIsr::get_instance() all the time.
- */
-static GPIOIsr &GPIO_Isr = GPIOIsr::get_instance();
+void start_service(GPIOIsrFlag flag);
+void stop_service(void);
 
 } // namespace idf
 

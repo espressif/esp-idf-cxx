@@ -10,20 +10,20 @@
 
 namespace idf {
 
-/**************************************************************************
- * GPIOIntr
- */
+void start_service(GPIOIsrFlag flag)
+{   
+    GPIO_CHECK_THROW(gpio_install_isr_service(flag.get_value()));
+}
+
+void stop_service(void)
+{
+    gpio_uninstall_isr_service();
+}
 
 void GPIOIntr::set_type(const GPIOIntrType type)
 {
     GPIO_CHECK_THROW(gpio_set_intr_type(gpio_num.get_value<gpio_num_t>(),
                                         type.get_value<gpio_int_type_t>()));
-}
-
-void GPIOIntr::driver_handler(void) {
-    for (auto &cb: cb_table) {
-        cb.second(gpio_num);
-    }
 }
 
 void GPIOIntr::add_callback(std::string cb_name, interrupt_callback_t func_cb)
@@ -88,26 +88,10 @@ void GPIOIntr::hdlr_bounce(void* class_ptr)
 	((*reinterpret_cast<GPIOIntr*>(class_ptr)).driver_handler)();
 }
 
-/**************************************************************************
- * GPIOIsr
- */
-
-GPIOIsr::GPIOIsr(): isr_service_started(false)
-{
-    // nothing to do here
-}
-
-void GPIOIsr::start_service(GPIOIsrFlag flag)
-{   
-    if (isr_service_started) { return; }
-    GPIO_CHECK_THROW(gpio_install_isr_service(flag.get_value()));
-    isr_service_started = true;
-}
-
-void GPIOIsr::stop_service(void)
-{
-    gpio_uninstall_isr_service();
-    isr_service_started = false;
+void GPIOIntr::driver_handler(void) {
+    for (auto &cb: cb_table) {
+        cb.second(gpio_num);
+    }
 }
 
 }  // namespace idf

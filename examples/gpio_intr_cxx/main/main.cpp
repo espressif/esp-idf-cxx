@@ -75,7 +75,7 @@ extern "C" void app_main(void)
 {
     // install ISR service before any interrupt related code
     try {
-        GPIO_Isr.start_service(GPIOIsrFlag().LEVEL1());
+        start_service(GPIOIsrFlag().LEVEL1());
     }
     catch (const GPIOException& e) {
         printf("[0x%x]: %s\n", e.error, e.what());
