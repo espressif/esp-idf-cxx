@@ -1,20 +1,21 @@
 # ESP-IDF-C++
 
-This project provides C++ wrapper classes around some components of [esp-idf](https://github.com/espressif/esp-idf). It is organized as a component. For more information how to use ESP-IDF components and how to set up ESP-IDF, please refer to [esp-idf](https://github.com/espressif/esp-idf).
+This project provides C++ wrapper classes around some components of [esp-idf](https://github.com/espressif/esp-idf). It is organized as a component for the [IDF component manager](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/tools/idf-component-manager.html). You can find this component [in the component registry](https://components.espressif.com/components/espressif/esp-idf-cxx). 
 
 ## *NOTE*
-
-This repository hasn't been released yet. After the code is in a state that is convincing, we will release it for the component manager. Before the release, there might be breaking changes.
-
-Some bits that are still missing (non-exhaustive list):
+This component is in a beta-release phase. Some bits that are still missing (non-exhaustive list):
 * MQTT C++ classes
 * Default pin definition on Kconfig for some examples
-* Upload into the component registry (need to be done together with release)
 
-That being said, suggestions are very welcome. To use the project in the current state, follow the usual process for setting up the IDF environment (i.e., `. ./export.sh` inside [esp-idf](https://github.com/espressif/esp-idf)). Then checkout this repository and change to the examples or unit tests and try them right away. The component manager is set up for these to find the esp-idf-cxx component locally.
+A road map and detailed release document will be announced soon.
 
 ## Requirements
 
-* ESP-IDF and its requirements
+* ESP-IDF and its requirements.
+  Please follow the [ESP-IDF "Get Started" Programming Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html) to download, install and setup esp-idf.
 
 No other special requirements are necessary.
+
+## Usage
+
+Set up the IDF environment (i.e., `. ./export.sh` inside [esp-idf](https://github.com/espressif/esp-idf)). Then go to your project directory, use `idf.py add-dependency espressif/esp-idf-cxx^1.0.0-beta ` (should only be done once) and you should be able to use this component.
