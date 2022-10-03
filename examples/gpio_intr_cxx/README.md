@@ -10,15 +10,17 @@ This is necessary for the C++ APIs.
 
 ## How to use example
 
+The example demonstrates the usage of lambda function, static function and non static member method
+as callback for GPIO interrupts.
+It also highlights the registration of several callbacks to the same GPIO interrupt.
+
 ### Hardware Required
 
 Any ESP32 family development board.
 
 Connect a line on the 3.3V output of the ESP32 family development board.
 
-Use the line to trigger a state change from LOW to HIGH on the GPIO configured as input with pull-down in the main.cpp (by default it is set to GPIO 10).
-
-The interrupt callback provided in the class `TriggerCounter` should be triggered, incrementing a counter variable resulting in an output on the console.
+Use the line to trigger a state change from LOW to HIGH on the GPIOs configured as input with pull-down in the main.cpp (by default GPIO 12, 13 and 27 are set).
 
 ### Configure the project
 
