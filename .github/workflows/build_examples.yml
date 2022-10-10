@@ -1,6 +1,10 @@
 name: Build Examples
 
-on: [push, pull_request]
+on:
+  schedule:
+    - cron: '0 0 * * *' # Once per day at midnight   
+  pull_request:
+    - types: [opened, reopened, synchronize]
 
 jobs:
   host_test:
