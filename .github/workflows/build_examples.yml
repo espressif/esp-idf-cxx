@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: '0 0 * * *' # Once per day at midnight   
   pull_request:
-    - types: [opened, reopened, synchronize]
+    types: [opened, reopened, synchronize]
 
 jobs:
   host_test:
