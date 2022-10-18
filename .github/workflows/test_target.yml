@@ -14,7 +14,7 @@ jobs:
       matrix:
         idf_ver: ["latest"]
         idf_target: ["esp32", "esp32c3"]
-        test_app_name: ["esp_event", "esp_timer"]
+        test_app_name: ["esp_event", "esp_timer", "cxx_exception"]
     runs-on: ubuntu-20.04
     container: espressif/idf:${{ matrix.idf_ver }}
     steps:
@@ -47,7 +47,7 @@ jobs:
       matrix:
         idf_ver: ["latest"]
         idf_target: ["esp32", "esp32c3"]
-        test_app_name: ["esp_event", "esp_timer"]
+        test_app_name: ["esp_event", "esp_timer", "cxx_exception"]
     runs-on: [self-hosted, linux, docker, "${{ matrix.idf_target }}"]
     container:
       image: python:3.7-buster
