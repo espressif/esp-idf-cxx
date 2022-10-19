@@ -1,6 +1,6 @@
 idf_build_get_property(target IDF_TARGET)
 
-set(srcs "esp_timer_cxx.cpp" "esp_exception.cpp" "gpio_cxx.cpp" "i2c_cxx.cpp" "spi_cxx.cpp" "spi_host_cxx.cpp")
+set(srcs "esp_timer_cxx.cpp" "esp_exception.cpp" "gpio_cxx.cpp" "gpio_intr_cxx.cpp" "i2c_cxx.cpp" "spi_cxx.cpp" "spi_host_cxx.cpp")
 set(requires "esp_timer")
 
 if(NOT ${target} STREQUAL "linux")

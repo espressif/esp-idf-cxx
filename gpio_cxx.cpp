@@ -12,8 +12,6 @@
 
 namespace idf {
 
-#define GPIO_CHECK_THROW(err) CHECK_THROW_SPECIFIC((err), GPIOException)
-
 namespace {
 #if CONFIG_IDF_TARGET_LINUX
 constexpr std::array<uint32_t, 1> INVALID_GPIOS = {24};
@@ -156,6 +154,13 @@ GPIODriveStrength GPIOBase::get_drive_strength()
 GPIOInput::GPIOInput(GPIONum num) : GPIOBase(num)
 {
     GPIO_CHECK_THROW(gpio_set_direction(gpio_num.get_value<gpio_num_t>(), GPIO_MODE_INPUT));
+}
+
+GPIOInput::GPIOInput(const GPIONum num, const GPIOPullMode mode, const GPIODriveStrength strength)
+    : GPIOInput(num)
+{
+    set_pull_mode(mode);
+    set_drive_strength(strength);
 }
 
 GPIOLevel GPIOInput::get_level() const noexcept

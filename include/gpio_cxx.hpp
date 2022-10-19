@@ -13,6 +13,8 @@
 
 namespace idf {
 
+#define GPIO_CHECK_THROW(err) CHECK_THROW_SPECIFIC((err), GPIOException)
+
 /**
  * @brief Exception thrown for errors in the GPIO C++ API.
  */
@@ -32,6 +34,7 @@ esp_err_t check_gpio_pin_num(uint32_t pin_num) noexcept;
  * Check if the numeric value of a drive strength is valid on the current hardware.
  */
 esp_err_t check_gpio_drive_strength(uint32_t strength) noexcept;
+
 
 /**
  * This is a "Strong Value Type" class for GPIO. The GPIO pin number is checked during construction according to
@@ -56,6 +59,11 @@ public:
 
     using StrongValueComparable<uint32_t>::operator==;
     using StrongValueComparable<uint32_t>::operator!=;
+
+    /**
+     * Retrieves the valid numerical representation of the GPIO number.
+     */
+    uint32_t get_num() const { return get_value(); };
 };
 
 /**
@@ -260,6 +268,8 @@ protected:
      * @brief The number of the configured GPIO pin.
      */
     GPIONum gpio_num;
+
+    inline const GPIONum& get_gpio_num(void) const noexcept { return gpio_num; }
 };
 
 /**
@@ -311,6 +321,15 @@ public:
     GPIOInput(GPIONum num);
 
     /**
+     * @brief Constructs and fully configure a GPIO as input
+     * 
+     * @param num GPIO pin number of the GPIO to be configured.
+     * @param mode The pull mode to configure on the GPIO
+     * @param strength The internal pull resistor strength to setup on the GPIO 
+     */
+    GPIOInput(const GPIONum num, const GPIOPullMode mode, const GPIODriveStrength strength);
+
+    /**
      * @brief Read the current level of the GPIO.
      *
      * @return The GPIO current level of the GPIO.
@@ -339,6 +358,11 @@ public:
      * @throws GPIOException if the underlying driver function fails.
      */
     void wakeup_disable();
+
+    using GPIOBase::set_drive_strength;
+    using GPIOBase::get_drive_strength;
+
+    using GPIOBase::get_gpio_num;
 };
 
 /**
