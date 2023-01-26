@@ -136,12 +136,12 @@ GPIO_Output::GPIO_Output(GPIONum num) : GPIOBase(num)
     GPIO_CHECK_THROW(gpio_set_direction(gpio_num.get_value<gpio_num_t>(), GPIO_MODE_OUTPUT));
 }
 
-void GPIO_Output::set_high()
+void GPIO_Output::set_high() const
 {
     GPIO_CHECK_THROW(gpio_set_level(gpio_num.get_value<gpio_num_t>(), 1));
 }
 
-void GPIO_Output::set_low()
+void GPIO_Output::set_low() const
 {
     GPIO_CHECK_THROW(gpio_set_level(gpio_num.get_value<gpio_num_t>(), 0));
 }
@@ -168,19 +168,19 @@ GPIOLevel GPIOInput::get_level() const noexcept
     }
 }
 
-void GPIOInput::set_pull_mode(GPIOPullMode mode)
+void GPIOInput::set_pull_mode(GPIOPullMode mode) const
 {
     GPIO_CHECK_THROW(gpio_set_pull_mode(gpio_num.get_value<gpio_num_t>(),
                                         mode.get_value<gpio_pull_mode_t>()));
 }
 
-void GPIOInput::wakeup_enable(GPIOWakeupIntrType interrupt_type)
+void GPIOInput::wakeup_enable(GPIOWakeupIntrType interrupt_type) const
 {
     GPIO_CHECK_THROW(gpio_wakeup_enable(gpio_num.get_value<gpio_num_t>(),
                                         interrupt_type.get_value<gpio_int_type_t>()));
 }
 
-void GPIOInput::wakeup_disable()
+void GPIOInput::wakeup_disable() const
 {
     GPIO_CHECK_THROW(gpio_wakeup_disable(gpio_num.get_value<gpio_num_t>()));
 }
@@ -190,12 +190,12 @@ GPIO_OpenDrain::GPIO_OpenDrain(GPIONum num) : GPIOInput(num)
     GPIO_CHECK_THROW(gpio_set_direction(gpio_num.get_value<gpio_num_t>(), GPIO_MODE_INPUT_OUTPUT_OD));
 }
 
-void GPIO_OpenDrain::set_floating()
+void GPIO_OpenDrain::set_floating() const
 {
     GPIO_CHECK_THROW(gpio_set_level(gpio_num.get_value<gpio_num_t>(), 1));
 }
 
-void GPIO_OpenDrain::set_low()
+void GPIO_OpenDrain::set_low() const
 {
     GPIO_CHECK_THROW(gpio_set_level(gpio_num.get_value<gpio_num_t>(), 0));
 }

@@ -282,14 +282,14 @@ public:
      *
      * @throws GPIOException if the underlying driver function fails.
      */
-    void set_high();
+    void set_high() const;
 
     /**
      * @brief Set GPIO to low level.
      *
      * @throws GPIOException if the underlying driver function fails.
      */
-    void set_low();
+    void set_low() const;
 
     using GPIOBase::set_drive_strength;
     using GPIOBase::get_drive_strength;
@@ -324,21 +324,21 @@ public:
      *
      * @throws GPIOException if the underlying driver function fails.
      */
-    void set_pull_mode(GPIOPullMode mode);
+    void set_pull_mode(GPIOPullMode mode) const;
 
     /**
      * @brief Configure the pin as wake up pin.
      *
      * @throws GPIOException if the underlying driver function fails.
      */
-    void wakeup_enable(GPIOWakeupIntrType interrupt_type);
+    void wakeup_enable(GPIOWakeupIntrType interrupt_type) const;
 
     /**
      * @brief Disable wake up functionality for this pin if it was enabled before.
      *
      * @throws GPIOException if the underlying driver function fails.
      */
-    void wakeup_disable();
+    void wakeup_disable() const;
 };
 
 /**
@@ -363,14 +363,14 @@ public:
      *
      * @throws GPIOException if the underlying driver function fails.
      */
-    void set_floating();
+    void set_floating() const;
 
     /**
      * @brief Set GPIO to low level.
      *
      * @throws GPIOException if the underlying driver function fails.
      */
-    void set_low();
+    void set_low() const;
 
     using GPIOBase::set_drive_strength;
     using GPIOBase::get_drive_strength;

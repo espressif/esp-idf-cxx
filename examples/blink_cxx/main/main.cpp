@@ -22,7 +22,7 @@ extern "C" void app_main(void)
     try {
         /* This line may throw an exception if the pin number is invalid.
          * Alternatively to 4, choose another output-capable pin. */
-        GPIO_Output gpio(GPIONum(4));
+        const GPIO_Output gpio(GPIONum(4));
 
         while (true) {
             printf("LED ON\n");
