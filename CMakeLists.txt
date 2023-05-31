@@ -7,7 +7,7 @@ if(NOT ${target} STREQUAL "linux")
     list(APPEND srcs
         "esp_event_api.cpp"
         "esp_event_cxx.cpp")
-    list(APPEND requires "esp_event")
+    list(APPEND requires "esp_event" "pthread")
 endif()
 
 idf_component_register(SRCS ${srcs}
