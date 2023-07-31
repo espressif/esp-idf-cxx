@@ -2,18 +2,19 @@ name: Build Examples
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Once per day at midnight   
+    - cron: '0 0 * * *' # Once per day at midnight
   pull_request:
     types: [opened, reopened, synchronize]
 
 jobs:
-  host_test:
+  build:
     strategy:
       matrix:
-        app_name: [blink_cxx, simple_i2c_rw_example, esp_event_async_cxx, esp_timer_cxx, simple_spi_rw_example]
+        app_name: [blink_cxx, simple_i2c_rw_example, esp_event_async_cxx, esp_timer_cxx, simple_spi_rw_example, memory_resource]
+        idf_ver: ["latest", "release-v5.0", "release-v5.1"]
     name: Build
     runs-on: ubuntu-20.04
-    container: espressif/idf:release-v5.0
+    container: espressif/idf:${{ matrix.idf_ver }}
     steps:
       - name: Checkout esp-idf-cxx
         uses: actions/checkout@master
@@ -21,8 +22,6 @@ jobs:
       - name: Build ${{ matrix.app_name }}
         shell: bash
         run: |
-          apt-get update && apt-get install -y gcc-8 g++-8
-          update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8
           . ${IDF_PATH}/export.sh
           cd $GITHUB_WORKSPACE/examples/${{ matrix.app_name }}
           idf.py build
