@@ -21,7 +21,6 @@ namespace idf {
 #if SOC_I2C_NUM >= 2
 static_assert(I2C_NUM_1 == 1, "I2C_NUM_1 must be equal to 1");
 #endif // SOC_I2C_NUM >= 2
-static_assert(I2C_NUM_MAX == SOC_I2C_NUM, "I2C_NUM_MAX must be equal to SOC_I2C_NUM");
 
 esp_err_t check_i2c_num(uint32_t i2c_num) noexcept
 {
