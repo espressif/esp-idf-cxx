@@ -2,7 +2,7 @@
 
 (See the README.md file in the upper level 'examples' directory for more information about examples.)
 
-This example demonstrates usage of C++ exceptions in ESP-IDF. It is the C++ equivalent to the [I2C Simple Example](../../../peripherals/i2c/i2c_simple/) which is written in C.
+This example demonstrates usage of C++ exceptions in ESP-IDF. It is the C++ equivalent to the [I2C Simple Example](https://github.com/espressif/esp-idf/tree/master/examples/peripherals/i2c/i2c_simple/) which is written in C.
 
 In this example, the `sdkconfig.defaults` file sets the `CONFIG_COMPILER_CXX_EXCEPTIONS` option. This enables both compile time support (`-fexceptions` compiler flag) and run-time support for C++ exception handling. This is necessary for the C++ I2C API.
 
@@ -57,4 +57,3 @@ If something went wrong:
 I2C Exception with error: ESP_FAIL (-1)
 Couldn't read sensor!
 ```
-
