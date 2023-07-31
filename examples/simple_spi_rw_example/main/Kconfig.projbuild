@@ -1,0 +1,44 @@
+menu "Example Configuration"
+
+    config SPI_NUM
+        int "SPI Num"
+        default 1 if IDF_TARGET_ESP32C6 || IDF_TARGET_ESP32H2 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32C2
+        default 2 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            The number of the chip's SPI peripheral.
+
+    config SPI_CS
+        int "CS GPIO Num"
+        default 10 if IDF_TARGET_ESP32C6 || IDF_TARGET_ESP32H2
+        default 23 if IDF_TARGET_ESP32
+        default 4 if IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32C2
+        help
+            GPIO number for SPI CS line.
+
+    config SPI_MOSI
+        int "MOSI GPIO Num"
+        default 11 if IDF_TARGET_ESP32C6 || IDF_TARGET_ESP32H2
+        default 25 if IDF_TARGET_ESP32
+        default 5 if IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32C2
+        help
+            GPIO number for SPI MOSI line.
+
+    config SPI_MISO
+        int "MISO GPIO Num"
+        default 0 if IDF_TARGET_ESP32C6
+        default 12 if IDF_TARGET_ESP32H2
+        default 26 if IDF_TARGET_ESP32
+        default 6 if IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32C2
+        help
+            GPIO number for SPI MISO line.
+
+    config SPI_SCLK
+        int "SCLK GPIO Num"
+        default 1 if IDF_TARGET_ESP32C6
+        default 22 if IDF_TARGET_ESP32H2
+        default 27 if IDF_TARGET_ESP32
+        default 7 if IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32C2
+        help
+            GPIO number for SPI SCLK line.
+
+endmenu
