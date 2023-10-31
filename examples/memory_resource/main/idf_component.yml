@@ -1,0 +1,8 @@
+## IDF Component Manager Manifest File
+dependencies:
+  idf:
+    version: ">=5.0"
+  espressif/esp-idf-cxx:
+    override_path: ../../../
+    version: "^1.0.0"
+

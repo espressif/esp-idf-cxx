@@ -17,8 +17,7 @@ jobs:
       - name: Build and Test
         shell: bash
         run: |
-          apt-get update && apt-get install -y gcc-8 g++-8 ruby
-          update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+          apt-get update && apt-get install -y g++ ruby
           . ${IDF_PATH}/export.sh
           cd $GITHUB_WORKSPACE/host_test/${{ matrix.app_name }}
           idf.py build
