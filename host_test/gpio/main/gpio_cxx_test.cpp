@@ -16,7 +16,6 @@
 
 #include <stdio.h>
 #include "esp_err.h"
-#include "freertos/portmacro.h"
 #include "gpio_cxx.hpp"
 #include "test_fixtures.hpp"
 
@@ -24,11 +23,6 @@
 
 extern "C" {
 #include "Mockgpio.h"
-}
-
-// TODO: IDF-2693, function definition just to satisfy linker, mock esp_common instead
-const char *esp_err_to_name(esp_err_t code) {
-    return "test";
 }
 
 using namespace std;

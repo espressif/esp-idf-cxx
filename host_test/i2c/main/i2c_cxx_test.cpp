@@ -13,8 +13,8 @@
 */
 #define CATCH_CONFIG_MAIN
 #include <stdio.h>
+#include "esp_err.h"
 #include "unity.h"
-#include "freertos/portmacro.h"
 #include "driver/i2c.h"
 #include "i2c_cxx.hpp"
 #include "system_cxx.hpp"
@@ -24,11 +24,6 @@
 
 extern "C" {
 #include "Mocki2c.h"
-}
-
-// TODO: IDF-2693, function definition just to satisfy linker, mock esp_common instead
-const char *esp_err_to_name(esp_err_t code) {
-    return "host_test error";
 }
 
 using namespace std;
@@ -183,7 +178,7 @@ TEST_CASE("I2CWrite calls driver correctly")
     // will actually write the data but for the tests it is enough for now
     i2c_master_write_ExpectWithArrayAndReturn(&cmd_fix.dummy_handle, expected_write, WRITE_SIZE, EXPECTED_DATA_LEN, true, ESP_OK);
     i2c_master_stop_ExpectAndReturn(&cmd_fix.dummy_handle, ESP_OK);
-    i2c_master_cmd_begin_ExpectAndReturn(0, &cmd_fix.dummy_handle, 1000 / portTICK_PERIOD_MS, ESP_OK);
+    i2c_master_cmd_begin_ExpectAndReturn(i2c_port_t(0), &cmd_fix.dummy_handle, 1000 / portTICK_PERIOD_MS, ESP_OK);
 
     std::vector<uint8_t> WRITE_BYTES = {0xAB, 0xBA};
     I2CWrite write(WRITE_BYTES);
@@ -218,7 +213,7 @@ TEST_CASE("I2CRead calls driver correctly")
     // will actually read the data but for the tests it is enough for now
     i2c_master_read_ReturnArrayThruPtr_data(READ_DATA, READ_SIZE);
     i2c_master_stop_ExpectAndReturn(&cmd_fix.dummy_handle, ESP_OK);
-    i2c_master_cmd_begin_ExpectAndReturn(0, &cmd_fix.dummy_handle, 1000 / portTICK_PERIOD_MS, ESP_OK);
+    i2c_master_cmd_begin_ExpectAndReturn(i2c_port_t(0), &cmd_fix.dummy_handle, 1000 / portTICK_PERIOD_MS, ESP_OK);
 
     I2CRead reader(READ_SIZE);
     std::vector<uint8_t> result = reader.do_transfer(I2CNumber::I2C0(), I2CAddress(0x47));
@@ -261,7 +256,7 @@ TEST_CASE("I2CComposed calls driver correctly")
     // will actually read the data but for the tests it is enough for now
     i2c_master_read_ReturnArrayThruPtr_data(READ_DATA, READ_SIZE);
     i2c_master_stop_ExpectAndReturn(&cmd_fix.dummy_handle, ESP_OK);
-    i2c_master_cmd_begin_ExpectAndReturn(0, &cmd_fix.dummy_handle, 1000 / portTICK_PERIOD_MS, ESP_OK);
+    i2c_master_cmd_begin_ExpectAndReturn(i2c_port_t(0), &cmd_fix.dummy_handle, 1000 / portTICK_PERIOD_MS, ESP_OK);
 
     I2CComposed composed_transfer;
     composed_transfer.add_write({0x47, 0x48, 0x49});
@@ -289,7 +284,7 @@ TEST_CASE("I2CWrite transfer calls driver correctly")
     // will actually write the data but for the tests it is enough for now
     i2c_master_write_ExpectWithArrayAndReturn(&cmd_fix.dummy_handle, expected_write, WRITE_SIZE, EXPECTED_DATA_LEN, true, ESP_OK);
     i2c_master_stop_ExpectAndReturn(&cmd_fix.dummy_handle, ESP_OK);
-    i2c_master_cmd_begin_ExpectAndReturn(0, &cmd_fix.dummy_handle, 1000 / portTICK_PERIOD_MS, ESP_OK);
+    i2c_master_cmd_begin_ExpectAndReturn(i2c_port_t(0), &cmd_fix.dummy_handle, 1000 / portTICK_PERIOD_MS, ESP_OK);
 
     I2CMaster master(I2CNumber::I2C0(), SCL_GPIO(1), SDA_GPIO(2), Frequency(400000));
     std::vector<uint8_t> WRITE_BYTES = {0xAB, 0xBA};
@@ -310,7 +305,7 @@ TEST_CASE("I2CMaster synchronous write")
     // will actually write the data but for the tests it is enough for now
     i2c_master_write_ExpectWithArrayAndReturn(&cmd_fix.dummy_handle, expected_write, WRITE_SIZE, EXPECTED_DATA_LEN, true, ESP_OK);
     i2c_master_stop_ExpectAndReturn(&cmd_fix.dummy_handle, ESP_OK);
-    i2c_master_cmd_begin_ExpectAndReturn(0, &cmd_fix.dummy_handle, 1000 / portTICK_PERIOD_MS, ESP_OK);
+    i2c_master_cmd_begin_ExpectAndReturn(i2c_port_t(0), &cmd_fix.dummy_handle, 1000 / portTICK_PERIOD_MS, ESP_OK);
 
     I2CMaster master(I2CNumber::I2C0(), SCL_GPIO(1), SDA_GPIO(2), Frequency(400000));
     std::vector<uint8_t> WRITE_BYTES = {0xAB, 0xBA};
@@ -332,7 +327,7 @@ TEST_CASE("I2CMaster synchronous read")
     // will actually read the data but for the tests it is enough for now
     i2c_master_read_ReturnArrayThruPtr_data(READ_DATA, READ_SIZE);
     i2c_master_stop_ExpectAndReturn(&cmd_fix.dummy_handle, ESP_OK);
-    i2c_master_cmd_begin_ExpectAndReturn(0, &cmd_fix.dummy_handle, 1000 / portTICK_PERIOD_MS, ESP_OK);
+    i2c_master_cmd_begin_ExpectAndReturn(i2c_port_t(0), &cmd_fix.dummy_handle, 1000 / portTICK_PERIOD_MS, ESP_OK);
 
     I2CMaster master(I2CNumber::I2C0(), SCL_GPIO(1), SDA_GPIO(2), Frequency(400000));
     std::vector<uint8_t> result = master.sync_read(I2CAddress(0x47), READ_SIZE);
@@ -365,7 +360,7 @@ TEST_CASE("I2CMaster syncronous transfer (read and write)")
     // will actually read the data but for the tests it is enough for now
     i2c_master_read_ReturnArrayThruPtr_data(READ_DATA, READ_SIZE);
     i2c_master_stop_ExpectAndReturn(&cmd_fix.dummy_handle, ESP_OK);
-    i2c_master_cmd_begin_ExpectAndReturn(0, &cmd_fix.dummy_handle, 1000 / portTICK_PERIOD_MS, ESP_OK);
+    i2c_master_cmd_begin_ExpectAndReturn(i2c_port_t(0), &cmd_fix.dummy_handle, 1000 / portTICK_PERIOD_MS, ESP_OK);
 
     I2CMaster master(I2CNumber::I2C0(), SCL_GPIO(1), SDA_GPIO(2), Frequency(400000));
     vector<uint8_t> read_result = master.sync_transfer(I2CAddress(0x47), {0x47, 0x48, 0x49}, READ_SIZE);
@@ -420,7 +415,7 @@ TEST_CASE("I2CSlave write calls driver functions correctly")
     I2CSlaveFix slave_fix(CreateAnd::IGNORE);
     const uint8_t WRITE_BUFFER[] = {0xAB, 0xCD};
     const size_t WRITE_BUFFER_LEN = sizeof(WRITE_BUFFER);
-    i2c_slave_write_buffer_ExpectWithArrayAndReturn(0,
+    i2c_slave_write_buffer_ExpectWithArrayAndReturn(i2c_port_t(0),
             WRITE_BUFFER,
             WRITE_BUFFER_LEN,
             WRITE_BUFFER_LEN,
@@ -450,7 +445,7 @@ TEST_CASE("I2CSlave read calls driver functions correctly")
     uint8_t WRITE_BUFFER[] = {0xAB, 0xCD};
     const size_t BUFFER_LEN = sizeof(WRITE_BUFFER);
     uint8_t read_buffer[BUFFER_LEN];
-    i2c_slave_read_buffer_ExpectAndReturn(0, read_buffer, BUFFER_LEN, 500 / portTICK_PERIOD_MS, BUFFER_LEN);
+    i2c_slave_read_buffer_ExpectAndReturn(i2c_port_t(0), read_buffer, BUFFER_LEN, 500 / portTICK_PERIOD_MS, BUFFER_LEN);
     i2c_slave_read_buffer_ReturnArrayThruPtr_data(WRITE_BUFFER, BUFFER_LEN);
 
     I2CSlave slave(I2CNumber::I2C0(), SCL_GPIO(3), SDA_GPIO(4), I2CAddress(0x47), 64, 64);
