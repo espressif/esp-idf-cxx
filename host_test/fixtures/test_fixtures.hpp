@@ -302,7 +302,7 @@ struct SPITransactionDescriptorFix {
 };
 
 struct I2CMasterFix {
-    I2CMasterFix(i2c_port_t port_arg = 0) : i2c_conf(), port(port_arg)
+    I2CMasterFix(i2c_port_t port_arg = i2c_port_t(0)) : i2c_conf(), port(port_arg)
     {
         i2c_conf.mode = i2c_mode_t::I2C_MODE_MASTER;
         i2c_conf.sda_io_num = 2;
@@ -322,7 +322,7 @@ struct I2CMasterFix {
 
 #if CONFIG_SOC_I2C_SUPPORT_SLAVE
 struct I2CSlaveFix {
-    I2CSlaveFix(CreateAnd flags, i2c_port_t port_arg = 0, size_t buffer_size = 64) : i2c_conf(), port(port_arg)
+    I2CSlaveFix(CreateAnd flags, i2c_port_t port_arg = i2c_port_t(0), size_t buffer_size = 64) : i2c_conf(), port(port_arg)
     {
         if (flags == CreateAnd::SUCCEED) {
             i2c_conf.mode = i2c_mode_t::I2C_MODE_SLAVE;

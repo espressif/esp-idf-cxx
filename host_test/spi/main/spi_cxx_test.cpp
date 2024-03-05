@@ -14,18 +14,13 @@
 
 #define CATCH_CONFIG_MAIN
 #include <stdio.h>
-#include "freertos/portmacro.h"
+#include "esp_err.h"
 #include "spi_host_cxx.hpp"
 #include "spi_host_private_cxx.hpp"
 #include "system_cxx.hpp"
 #include "test_fixtures.hpp"
 
 #include "catch.hpp"
-
-// TODO: IDF-2693, function definition just to satisfy linker, mock esp_common instead
-const char *esp_err_to_name(esp_err_t code) {
-    return "host_test error";
-}
 
 using namespace std;
 using namespace idf;

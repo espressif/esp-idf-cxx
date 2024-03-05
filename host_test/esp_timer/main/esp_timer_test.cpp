@@ -25,11 +25,6 @@ extern "C" {
 #include "Mockesp_timer.h"
 }
 
-// TODO: IDF-2693, function definition just to satisfy linker, mock esp_common instead
-const char *esp_err_to_name(esp_err_t code) {
-    return "test";
-}
-
 using namespace std;
 using namespace idf;
 using namespace idf::esp_timer;
